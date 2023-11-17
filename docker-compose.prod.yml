@@ -1,0 +1,9 @@
+version: '3'
+services:
+ backend:
+  build:
+   context: .
+  volumes:
+   - ./src/upload:/app/upload
+  command: npm start
+

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Class Payment Reminder</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .logo img {
+      max-width: 200px;
+    }
+
+    .content {
+      margin-bottom: 20px;
+    }
+
+    .button {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .button a {
+      display: inline-block;
+      background-color: #007bff;
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: bold;
+      padding: 10px 20px;
+      border-radius: 4px;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: #999999;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="logo">
+      <img src="https://escraowme.cyclic.app/rahmoun-logo1.png" alt="Your Group Logo">
+      <h2>Class Payment Reminder</h2>
+    </div>
+
+    <div class="content">
+      <p>Dear {{name}},</p>
+      <p>This is a reminder that you need to repay the class fees before the next lesson in {{className}}. Failure to do so will result in restricted access to the class.</p>
+      <p>Please ensure that you complete the payment as soon as possible to avoid any inconvenience.</p>
+      <p>If you have already made the payment, please disregard this message.</p>
+      <p>Thank you for your cooperation.</p>
+    </div>
+
+    <div class="button">
+      <a href="{{url}}">Repay Now</a>
+    </div>
+
+    <div class="footer">
+      <p>Username: {{name}}</p>
+      <p>Group Name: {{className}}</p>
+      <p>&copy; 2023 Your Group. All rights reserved.</p>
+    </div>
+  </div>
+
+</body>
+</html>
