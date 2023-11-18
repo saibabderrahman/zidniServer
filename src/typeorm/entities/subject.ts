@@ -2,8 +2,6 @@ import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, JoinColum
 import { Teacher } from './Teacher';
 import { Category } from './Category';
 import { Levels } from './Levels';
-import { Order } from './Order';
-import { User } from './User';
 import { Lesson } from './Lesson';
 import { Educational_cycle } from './Educational_cycle';
 
@@ -41,4 +39,6 @@ export class Subject {
   cycle: Educational_cycle;
   @Column({ default:0 })
   coures: number;
+  @Column({ default: () => 'CURRENT_TIMESTAMP' })
+  startAt: Date;
 }

@@ -30,27 +30,64 @@ export class AcaOrderService {
       .createQueryBuilder('order')
       .leftJoinAndSelect("order.educational_cycle" ,"educational_cycle")
       .where('order.email = :email', { email: orderDto.email })
-      .andWhere('order.phoneNumber = :phoneNumber', { phoneNumber: orderDto.phoneNumber })
+      //.andWhere('order.phoneNumber = :phoneNumber', { phoneNumber: orderDto.phoneNumber })
       .andWhere('educational_cycle.id = :id', { id: orderDto.educational_cycle })
       .getOne();
       if (existingOrder) {
         throw new BadRequestException('هناك طلب مسبق بنفس البريد الإلكتروني ورقم الهاتف والدورة التدريبية.');
       }
       const NewOrder = {
-        ...orderDto ,educational_cycle
+        ...orderDto,price:educational_cycle.price ,educational_cycle
       }
       return await this.acaOrderRepository.save(NewOrder);
     } catch (error) {
       throw new BadRequestException(error) 
     }
   }
+  async calculateTotalPaidToday(): Promise<number> {
+    try {
+      const today = new Date();
+      today.setUTCHours(0, 0, 0, 0);
+
+      const totalPaidToday = await this.acaOrderRepository
+        .createQueryBuilder('order')
+        .select('SUM(order.price)', 'totalPaid')
+        .where('order.status = :status', { status: 'paid' })
+        .andWhere('order.createdAt >= :today', { today })
+        .getRawOne();
+
+      return totalPaidToday.totalPaid || 0;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+  async calculateTotalPaidBetweenDates(startDate: Date, endDate: Date): Promise<number> {
+    try {
+      startDate.setUTCHours(0, 0, 0, 0);
+      endDate.setUTCHours(23, 59, 59, 999);
+
+      const totalPaidBetweenDates = await this.acaOrderRepository
+        .createQueryBuilder('order')
+        .select('SUM(order.price)', 'totalPaid')
+        .where('order.status = :status', { status: 'paid' })
+        .andWhere('order.createdAt >= :startDate', { startDate })
+        .andWhere('order.createdAt <= :endDate', { endDate })
+        .getRawOne();
+
+      return totalPaidBetweenDates.totalPaid || 0;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
 
   async findAllAcaOrders(options:Options) {
     try {
-
       const queryBuild = await this.acaOrderRepository.createQueryBuilder('AcaOrder')
       .leftJoinAndSelect('AcaOrder.educational_cycle', 'educational_cycle')
       .leftJoinAndSelect('AcaOrder.user', 'user')
+      .where("AcaOrder.active = false")
+      .orderBy('AcaOrder.updatedAt', 'DESC');
+
   
       const { limit , page } = options;
       const offset = (page - 1) * limit || 0;
@@ -93,7 +130,8 @@ export class AcaOrderService {
 
     try {
       const existingOrder = await this.findAcaOrderById(id);
-      await this.acaOrderRepository.remove(existingOrder);
+      existingOrder.active =true
+      await this.acaOrderRepository.save(existingOrder);
     } catch (error) {
       throw new NotFoundException('AcaOrder is already paid or not found.');
     }
@@ -103,12 +141,19 @@ export class AcaOrderService {
 
     try {
       const order = await this.findAcaOrderById(id);
+
+      console.log(order)
       if (order.status === 'notPaid') {
         
        if(order.educational_cycle){
+
          const   user =  await this.UsersService.createFromOrder(order,order.educational_cycle)
          order.status = 'paid';
+         order.educational_cycle.seatsAvailable -=1
+         order.educational_cycle.seatsTaken +=1
          order.user =user
+         order.price = Number(order.educational_cycle.price)
+         await this.EducationalCycleService.save(order.educational_cycle)
          return this.acaOrderRepository.save(order);
        }
       } else {

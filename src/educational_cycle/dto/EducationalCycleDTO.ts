@@ -76,9 +76,6 @@ export class EducationalCycleDTO {
   @IsArray()
   @ArrayMinSize(0)
   studentIds: number[];
-  @IsOptional()
-  @IsArray()
-  @ArrayMinSize(0)
-  WaitingConfirmation: number[];
+
 
 }

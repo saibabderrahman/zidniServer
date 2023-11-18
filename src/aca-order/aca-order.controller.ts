@@ -25,7 +25,19 @@ export class AcaOrderController {
 
     return this.acaOrderService.findAllAcaOrders(options);
   }
+  @Get("some")
+  async calculateTotalPaidToday(
+      ) {
 
+    return this.acaOrderService.calculateTotalPaidToday();
+  }
+  @Get('calculate-total-paid')
+  async calculateTotalPaidBetweenDates(
+    @Query('startDate') startDate: Date,
+    @Query('endDate') endDate: Date,
+  ) {
+    return this.acaOrderService.calculateTotalPaidBetweenDates(new Date(startDate), new Date(endDate));
+  }
   @Get(':id')
   async getAcaOrderById(@Param('id') id: number): Promise<AcaOrder> {
     return this.acaOrderService.acceptAcaOrder(id);

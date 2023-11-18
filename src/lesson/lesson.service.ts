@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 import { Order } from '../typeorm/entities/Order';
 import { Admin } from '../typeorm/entities/Admin';
 import { Attendance } from '../typeorm/entities/Attendance';
@@ -9,6 +9,7 @@ import { Between, Repository } from 'typeorm';
 import { Lesson } from '../typeorm/entities/Lesson';
 import { Subject } from 'src/typeorm/entities/subject';
 import { LessonDto } from './dto';
+import { Options, queryAndPaginate } from 'src/utility/helpers.utils';
 
 
 @Injectable()
@@ -51,7 +52,7 @@ async CreateLesson(data:LessonDto){
         if (existingLesson) {
           throw new ForbiddenException('A lesson already exists today for this class');
         }
-         const Lesson = await this.LessonRepository.create({subject:queryBuild ,name:data.name,url:data.url})
+         const Lesson = await this.LessonRepository.create({subject:queryBuild ,name:data.name,url:data.url ,platform:data.platform})
          const lessons = await this.LessonRepository.save(Lesson)
          return {success:true}
         
@@ -62,6 +63,33 @@ async CreateLesson(data:LessonDto){
     }
 }
 
+
+async findAll(options:Options){
+  try {
+      const queryBuild = await this.LessonRepository.createQueryBuilder('lesson')
+      .leftJoinAndSelect("lesson.subject" ,"subject")
+      const { limit , page } = options;
+      const offset = (page - 1) * limit || 0;
+      const { totalCount, hasMore, data } = await queryAndPaginate(queryBuild, offset, limit);
+
+      return {
+          page: options.page || 1,
+          limit: limit,
+          totalCount: totalCount,
+          data: data,
+          hasMore: hasMore,
+        }; 
+
+  } catch (error) {
+      if(error.message){
+          throw new BadRequestException(error.message)
+      }
+      throw new BadRequestException(error.message)  
+
+      
+  }
+  
+}
 async  getClasses() {
   try {
     const today = new Date();
@@ -112,13 +140,26 @@ async  getClasses() {
   }
 }
 
-async findOneByID(id){
+async findOneByID(id:number){
   try {
-    const data = this.LessonRepository.findOne({where:{id},relations:['orders']})
+    const queryBuild = await this.LessonRepository.createQueryBuilder('lesson')
+    .leftJoinAndSelect("lesson.Attendance" ,"Attendance")
+    .leftJoinAndSelect("Attendance.order" ,"order")
+    .where("lesson.id = :id",{id})
+    .getOne()
+
+    return queryBuild
+
   } catch (error) {
+    if(error.message){
+      throw new BadRequestException(error.message)
+  }
+  throw new BadRequestException(error.message)  
+
     
   }
 }
+
 async updateOneByID(id:number){
   try {
     let lesson = await this.LessonRepository.findOne({where:{id}})

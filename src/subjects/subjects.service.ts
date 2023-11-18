@@ -44,6 +44,7 @@ export class SubjectsService {
             .leftJoinAndSelect('Subject.Category', 'Category')
             .leftJoinAndSelect('Subject.cycle', 'cycle')
             .leftJoinAndSelect('Subject.teacher', 'teacher')
+            .leftJoinAndSelect('Subject.lessons', 'lessons')
         
             const { limit , page } = options;
             const offset = (page - 1) * limit || 0;
@@ -68,11 +69,14 @@ export class SubjectsService {
         
     }
     async findOneByd(id:number){
+
+        
         try {
             const existingSubject = await this.subjectRepository.createQueryBuilder('Subject')
             .leftJoinAndSelect('Subject.Level', 'Level')
             .leftJoinAndSelect('Subject.Category', 'Category')
             .leftJoinAndSelect('Subject.cycle', 'cycle')
+            .leftJoinAndSelect('Subject.lessons', 'lessons')
             .leftJoinAndSelect('Subject.teacher', 'teacher')
             .where('Subject.id = :id', { id })
             .getOne(); 

@@ -12,8 +12,6 @@ export class Order {
   id: number;
   @ManyToOne(() => Classes, product => product.orders)
   Class: Classes;
-  /*@ManyToOne(() => Lesson, product => product.orders)
-  Lessons: Lesson;*/
   @ManyToOne(() => User, user => user.orders)
   user: User;
   @ManyToOne(() => Teacher, user => user.orders)

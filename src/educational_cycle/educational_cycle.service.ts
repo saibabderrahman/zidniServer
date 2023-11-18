@@ -22,6 +22,18 @@ export class EducationalCycleService {
         }
     }
     }
+    async save(data: EducationalCycleDTO): Promise<Educational_cycle> {
+        
+        try {
+            return await this.educationRepository.save(data);
+        } catch (error) {
+            if (error.message) {
+                throw new BadRequestException(error.message);
+            } else {
+                throw new BadRequestException(error);
+            }
+        }
+        }
 
     async findAll(options:Options) {
         const queryBuild = await this.educationRepository.createQueryBuilder('Educational_cycle')
@@ -45,11 +57,20 @@ export class EducationalCycleService {
     }
 
     async findOne(id: number): Promise<Educational_cycle> {
-        const educational_cycle = await this.educationRepository.findOne({where:{id}});
-        if (!educational_cycle) {
+        const queryBuild = await this.educationRepository.createQueryBuilder('Educational_cycle')
+        .leftJoinAndSelect('Educational_cycle.orders', 'orders')
+        .leftJoinAndSelect('Educational_cycle.subjects', 'subjects')
+        .leftJoinAndSelect('subjects.lessons', 'lessons')
+        .leftJoinAndSelect('subjects.Level', 'Level')
+        .leftJoinAndSelect('subjects.Category', 'Category')
+        .leftJoinAndSelect('subjects.teacher', 'teacher')
+        .where("Educational_cycle.id = :id" ,{id})
+        .andWhere("orders.status = :paid" ,{paid:"paid"})
+        .getOne()
+        if (!queryBuild) {
             throw new NotFoundException(`Educational_cycle with ID ${id} not found`);
         }
-        return educational_cycle;
+        return queryBuild;
     }
 
     async update(id: number, data: Educational_cycle): Promise<Educational_cycle> {

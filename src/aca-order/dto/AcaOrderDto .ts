@@ -21,9 +21,17 @@ export class AcaOrderDto {
   educational_cycle: number;
 
   @IsString()
-  course: string;
+  cart:string
+  @IsString()
+  @IsOptional()
+
+  level:string
+
+
 
   @IsString()
+  @IsOptional()
+
   type: string;
 
   @IsString()

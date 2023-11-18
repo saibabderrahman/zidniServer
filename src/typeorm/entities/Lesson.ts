@@ -15,7 +15,7 @@ export class Lesson {
   state: string;
   @Column({nullable:true})
   name: string;
-  @Column({nullable:true})
+  @Column({nullable:true ,default:"telegram"})
   platform: string;
   @Column({ type:"text" ,nullable:true })
   url: string;
@@ -23,8 +23,6 @@ export class Lesson {
   Classes: Classes;
   @ManyToOne(() => Subject, (classes )=> classes.lessons)
   subject:Subject;
-  /*@ManyToOne(()=>Order ,  order => order.Class)
-  orders:Order[]*/
   @OneToMany(()=>Attendance,att=>att.Lesson)
   Attendance:Attendance[]
   @Column({ default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })

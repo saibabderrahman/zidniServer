@@ -19,9 +19,11 @@ export class AcaOrder {
   @Column()
   image:string
   @Column()
-  phoneNumber:string
+  price:number
   @Column()
-  course:string
+  phoneNumber:string
+  @Column({nullable:true})
+  cart:string
   @Column({default:"in person"})
   type:string
   @Column({ default: 'notPaid' })
@@ -34,6 +36,8 @@ export class AcaOrder {
   user: User;
   @Column({ nullable: true })
   gender: string;
+  @Column({ nullable: true })
+  level: string;
   @Column({ nullable: true })
   dateOfBirth: string; 
   @Column({ nullable: true })
