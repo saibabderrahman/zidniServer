@@ -21,16 +21,11 @@ services:
     - MYSQL_DATABASE=zidni
   volumes:
     - mysql_data:/var/lib/mysql
-##fronetend:
-## build:
-##   context: ../schoolEdolink
-##   dockerfile: Dockerfile
-## restart: always
-##admin:
-## build:
-##   context: ../admin_myproject
-##   dockerfile: Dockerfile
-## restart: always
+ admin:
+  build:
+    context: ../zidniAdmin
+    dockerfile: Dockerfile
+  restart: always
 
  redis:
   image: redis:latest
