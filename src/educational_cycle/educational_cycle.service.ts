@@ -65,7 +65,6 @@ export class EducationalCycleService {
         .leftJoinAndSelect('subjects.Category', 'Category')
         .leftJoinAndSelect('subjects.teacher', 'teacher')
         .where("Educational_cycle.id = :id" ,{id})
-        .andWhere("orders.status = :paid" ,{paid:"paid"})
         .getOne()
         if (!queryBuild) {
             throw new NotFoundException(`Educational_cycle with ID ${id} not found`);

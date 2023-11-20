@@ -36,7 +36,6 @@ import { Educational_cycle } from './typeorm/entities/Educational_cycle';
 import { Subject } from './typeorm/entities/subject';
 import { SubjectsModule } from './subjects/subjects.module';
 import { UploadImageModule } from './upload-image/upload-image.module';
-//import { configServiceDb } from './config/db.config';
 
 
 @Module({
@@ -51,7 +50,6 @@ import { UploadImageModule } from './upload-image/upload-image.module';
     BullModule.registerQueue({
       name:TRANSCODE_QUEUE,
     }),
-  //  TypeOrmModule.forRoot(configServiceDb.getTypeOrmConfig()),
     ConfigModule.forRoot(),
     MailerModule.forRootAsync({
       useFactory: () => ({
@@ -75,7 +73,6 @@ import { UploadImageModule } from './upload-image/upload-image.module';
         },
       }),
     }),
-   // TypeOrmModule.forRoot(configServiceDb.getTypeOrmConfig()),
 
     TypeOrmModule.forRoot({
       type: 'mysql',
