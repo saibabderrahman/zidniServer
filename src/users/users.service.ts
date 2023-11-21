@@ -205,6 +205,7 @@ export class UsersService {
         const randomIndex = Math.floor(Math.random() * charset.length);
         password += charset[randomIndex];
       }
+      console.log(password)
       return password;
     }
 
