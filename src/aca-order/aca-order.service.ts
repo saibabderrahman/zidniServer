@@ -109,6 +109,7 @@ export class AcaOrderService {
   }
 
   async findAcaOrderById(id: number): Promise<AcaOrder> {
+    console.log(id)
     const order = await this.acaOrderRepository.findOne({where:{id},relations:["educational_cycle" ,]});
     if (!order) {
       throw new NotFoundException(`AcaOrder with ID ${id} not found`);
@@ -142,7 +143,6 @@ export class AcaOrderService {
     try {
       const order = await this.findAcaOrderById(id);
 
-      console.log(order)
       if (order.status === 'notPaid') {
         
        if(order.educational_cycle){
@@ -160,6 +160,7 @@ export class AcaOrderService {
         throw new NotFoundException('AcaOrder is already paid or not found.');
       }
     } catch (error) {
+      console.log(error)
       throw new BadRequestException(error) 
 
       

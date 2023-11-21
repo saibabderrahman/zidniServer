@@ -65,7 +65,7 @@ import { UploadImageModule } from './upload-image/upload-image.module';
           from: 'doondoon273@gmail.com',
         },
         template: {
-          dir: join(__dirname, './templates'),
+          dir: join(__dirname, '../src/templates'),
           adapter: new HandlebarsAdapter(),
           options: {
             strict: true,

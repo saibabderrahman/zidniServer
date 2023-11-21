@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مرحبا بك في اكادمية زدني علما لتدريب والتكوين</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@100;200;300;400;500;600;700;800;900&family=Poppins:ital,wght@1,700&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Alexandria:wght@100;200;300;400;500;600;700;800;900&family=Poppins:ital,wght@1,700&display=swap');
+
+        body {
+            font-family: 'Alexandria', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+
+        header {
+            background: #ffffff;
+            color: #333;
+            padding: 1em 0;
+        }
+
+        header #logo {
+            text-align: center;
+        }
+
+        header #logo img {
+            width: 120px;
+            height: auto;
+        }
+
+        main {
+            padding: 2% 5%;
+        }
+
+        footer {
+            background: #ffffff;
+            color: #333;
+            padding: 1em 0;
+            text-align: center;
+        }
+
+        button {
+            background-color: #333;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+           .button {
+      display: inline-block;
+      background-color: #007bff;
+      color: #ffffff;
+      text-decoration: none;
+      padding: 12px 30px;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+
+        @media (max-width: 768px) {
+            header #logo img {
+                width: 80px;
+            }
+        }
+    </style>
+
+</head>
+
+<body dir="rtl">
+
+    <header>
+        <div class="container">
+            <div id="logo">
+                <a href="zidni">
+                    <img src="http:/212.24.103.160:8008/logo.png" alt="logo">
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <h2>مرحباً بك في أكاديمية زدني علمًا للتدريب والتوجيه</h2>
+            <p>لقد تمت الموافقة على انضمامك في الدورة. يمكنك متابعة التدريب باستخدام:</p>
+            <p><strong>اسم المستخدم:</strong> {{name}} </p>
+            <p><strong>كلمة المرور:</strong> {{password}}</p>
+            <p><strong>البريد الإلكتروني:</strong> {{email}} </p>
+            <a class="button" href="{{url}}">تسجيل الدخول إلى حسابك</a>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 contact@zidniilma.net. كل الحقوق محفوظة.</p>
+        </div>
+    </footer>
+
+</body>
+
+
+
+</html>

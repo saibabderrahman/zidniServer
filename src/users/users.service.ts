@@ -128,6 +128,18 @@ export class UsersService {
               throw new BadRequestException('phone number exist')
             }
             const user = await this.usersRepository.create(data)
+
+            await  this.transcodeQueue.add({
+              to: dto?.email,
+              template: 'addNewStudent',
+              subject:`تم الموافقة علي طلبك`,
+              context : {
+                name: dto?.firstName + " " + dto?.lastName,
+                password:data.password,
+                email:dto?.email,
+                url:"localhost"
+             },
+            });
            return await this.usersRepository.save(user)
         }
       } catch (error) {
