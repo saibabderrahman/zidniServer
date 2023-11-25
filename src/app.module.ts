@@ -43,7 +43,7 @@ import { UploadImageModule } from './upload-image/upload-image.module';
 
     BullModule.forRoot({
       redis: {
-        host: 'redis',
+        host: 'localhost',
         port: 6379,
       },
     }),

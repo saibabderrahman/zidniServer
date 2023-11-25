@@ -1,5 +1,5 @@
 import { UsersService } from './users.service';
-import { Controller, Post, Req, Res,UseInterceptors,UploadedFile , Body, Get, Param, HttpException, HttpStatus, ParseIntPipe, Query } from '@nestjs/common';
+import { Controller, Post, Req, Res,UseInterceptors,UploadedFile , Body, Get, Param,  HttpStatus, ParseIntPipe, Query } from '@nestjs/common';
 import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { userDto } from './Dto';
@@ -23,13 +23,10 @@ export class UsersController {
             }
   }
     @Post("signin")
-    async StudentSignin(@Res() res:Response, @Body() Dto:{email:string,password:string}){
+    async StudentSignin( @Body() Dto:{email:string,password:string}){
         const user = await this.userService.Login(Dto)
-        if(user.token){
-          res.status(201).json({ user, message:"welcome"})
-        }else{
-          res.status(400).json(user)
-        }
+        return user
+      
     }
     @Get("")
     async findAllStudent(

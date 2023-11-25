@@ -1,4 +1,4 @@
-import { Controller, Post, Req, Res,UseInterceptors,UploadedFile , Body, Get, Param, HttpException, HttpStatus, Query, ParseIntPipe } from '@nestjs/common';
+import { Controller, Post, Req, Res,UseInterceptors,UploadedFile , Body, Get, Param, HttpStatus, Query, ParseIntPipe } from '@nestjs/common';
 import { TeacherService } from './teacher.service';
 import { Response } from 'express';
 import { TeacherDto } from './Dto';

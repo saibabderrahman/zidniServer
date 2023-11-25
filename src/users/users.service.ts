@@ -70,16 +70,17 @@ export class UsersService {
       try {
           const student = await this.usersRepository.findOneBy({email:Dto.email})
           if(!student){
-              throw new ForbiddenException('this user is not exist try other email please')
+              throw new ForbiddenException('email or password are not correct')
           }else{
               const isMatch =  await student.comparePassword(Dto.password)
               if(isMatch){
                   const access_token = await this.userSingin(student.id , student.email)
-                  return { student, token: access_token.access_token }
+                  delete student.password
+                  return { ...student, token: access_token.access_token }
               }
               throw new ForbiddenException('password not correct ')}   
       } catch (error) {
-          return error.message    
+        throw new BadRequestException(error)
       }
     }
     public async findOne(id: any) {
@@ -117,7 +118,6 @@ export class UsersService {
       try {
         const data =  await this.createOrderAndUser(dto)
 
-        console.log(data.password)
         const student = await this.usersRepository.findOne({where:{email:data.email}})
         if(student){
             return await this.usersRepository.save(student)

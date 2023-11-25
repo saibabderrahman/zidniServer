@@ -38,9 +38,6 @@ export class EducationalCycleService {
     async findAll(options:Options) {
         const queryBuild = await this.educationRepository.createQueryBuilder('Educational_cycle')
         .leftJoinAndSelect('Educational_cycle.orders', 'orders')
-
-
-
         const { limit , page } = options;
         const offset = (page - 1) * limit || 0;
         const { totalCount, hasMore, data } = await queryAndPaginate(queryBuild, offset, limit);
@@ -66,6 +63,19 @@ export class EducationalCycleService {
         .leftJoinAndSelect('subjects.teacher', 'teacher')
         .where("Educational_cycle.id = :id" ,{id})
         .getOne()
+        if (!queryBuild) {
+            throw new NotFoundException(`Educational_cycle with ID ${id} not found`);
+        }
+        return queryBuild;
+    }
+    async findOneStudent(id: number): Promise<Educational_cycle[]> {
+        const queryBuild = await this.educationRepository.createQueryBuilder('Educational_cycle')
+        .leftJoinAndSelect('Educational_cycle.orders', 'orders')
+        .leftJoinAndSelect('orders.user', 'user')
+        .leftJoinAndSelect('Educational_cycle.subjects', 'subjects')
+        .where("user.id = :id" ,{id})
+        .select(["Educational_cycle" ,"subjects"])
+        .getMany()
         if (!queryBuild) {
             throw new NotFoundException(`Educational_cycle with ID ${id} not found`);
         }

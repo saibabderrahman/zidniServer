@@ -1,4 +1,4 @@
-import { Controller, Post, Req, Res,UseInterceptors,UploadedFile , Body, Get, Param, HttpException, HttpStatus, UseGuards } from '@nestjs/common';
+import { Controller, Post, Req, Res,UseInterceptors,UploadedFile , Body, Get, Param,  HttpStatus, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { AdminDto } from './Dto';
 import { FileInterceptor } from '@nestjs/platform-express';

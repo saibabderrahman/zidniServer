@@ -25,6 +25,10 @@ export class EducationalCycleController {
         const options = { page, limit };
         return this.educationalCycleService.findAll(options);
     }
+    @Get('student/:id')
+    findOneByStudnet(@Param('id') id: number): Promise<Educational_cycle []> {
+        return this.educationalCycleService.findOneStudent(id);
+    }
 
     @Get(':id')
     findOne(@Param('id') id: number): Promise<Educational_cycle> {
