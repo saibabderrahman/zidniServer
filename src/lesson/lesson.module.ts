@@ -15,6 +15,7 @@ import { Subject } from 'src/typeorm/entities/subject';
 @Module({
   imports:[TypeOrmModule.forFeature([Attendance,Admin,User,Classes,Lesson,Order,Subject])],
   providers: [LessonService,JwtStrategy],
-  controllers: [LessonController]
+  controllers: [LessonController],
+  exports:[LessonService]
 })
 export class LessonModule {}

@@ -83,7 +83,7 @@ export class UsersService {
         throw new BadRequestException(error)
       }
     }
-    public async findOne(id: any) {
+    public async findOne(id: number) {
       try {
         const student = await this.usersRepository.findOne({ where:{  id}} ,  );
         return student;

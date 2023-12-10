@@ -5,6 +5,7 @@ import { Classes } from './Classes';
 import { Attendance } from './Attendance';
 import { Educational_cycle } from './Educational_cycle';
 import { AcaOrder } from './acaOrders';
+import { Solution } from './solution';
 const  argon2  = require('argon2');
 
 
@@ -25,6 +26,8 @@ export class User {
   phoneNumber: number;
   @Column({ nullable: true })
   zipCode: number;
+  @OneToMany(() => Solution, cat => cat.user)
+  solutions: Solution;
   @Column()
   address: string;
   @OneToMany(() => Order, order => order.user)

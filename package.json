@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "dev1": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d database",
+    "dev1": "docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d database",
     "dev2": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d",
     "dev": "nest start",
     "build": "nest build",

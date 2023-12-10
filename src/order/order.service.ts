@@ -2,10 +2,8 @@ import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/commo
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from '../typeorm/entities/Order';
 import { Between, Repository } from 'typeorm';
-import { orderDto } from './dto';
 import { Classes } from '../typeorm/entities/Classes';
 import { User } from '../typeorm/entities/User';
-import { userDto } from 'src/users/Dto';
 import { Teacher } from '../typeorm/entities/Teacher';
 import { InjectQueue } from '@nestjs/bull';
 import { TRANSCODE_QUEUE } from '../constants';

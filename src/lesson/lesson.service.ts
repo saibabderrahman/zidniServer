@@ -1,9 +1,4 @@
 import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
-import { Order } from '../typeorm/entities/Order';
-import { Admin } from '../typeorm/entities/Admin';
-import { Attendance } from '../typeorm/entities/Attendance';
-import { Classes } from '../typeorm/entities/Classes';
-import { User } from '../typeorm/entities/User';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Repository } from 'typeorm';
 import { Lesson } from '../typeorm/entities/Lesson';
@@ -15,7 +10,6 @@ import { Options, queryAndPaginate } from 'src/utility/helpers.utils';
 @Injectable()
 export class LessonService {
     constructor(    @InjectRepository(Subject) private subjectRepository: Repository<Subject>,
-    @InjectRepository(Classes) private ClassRepository: Repository<Classes>,
     @InjectRepository(Lesson) private LessonRepository: Repository<Lesson>,
 ){}
 
@@ -140,7 +134,48 @@ async  getClasses() {
   }
 }
 
-async findOneByID(id:number){
+async  getLessonsToday(options:Options , id:number) {
+  try {
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+    const classesQuery = this.LessonRepository.createQueryBuilder('class')
+      .leftJoinAndSelect('class.subject', 'subject')
+      .leftJoinAndSelect('subject.teacher', 'teacher')
+      .leftJoinAndSelect('subject.Level', 'Level')
+      .leftJoinAndSelect('subject.Category', 'Category')
+      .leftJoinAndSelect('subject.cycle', 'cycle')
+      .leftJoinAndSelect('cycle.orders', 'orders')
+      .leftJoinAndSelect('orders.educational_cycle', 'educational_cycle')
+      .leftJoinAndSelect('orders.user', 'user')
+      .leftJoinAndSelect('orders.Attendance', 'Attendance')
+      .select(["class"  ,"teacher.lastName" ,"teacher.firstName" ,"Level.name","Category.name","educational_cycle.name"   , "subject.name","subject.start" ,"subject.end"])
+      .where('class.createdAt BETWEEN :start AND :end', { start: startOfDay, end: endOfDay })
+      .andWhere('user.id = :id' ,{id})
+      
+      const { limit , page } = options;
+      const offset = (page - 1) * limit || 0;
+      const { totalCount, hasMore, data } = await queryAndPaginate(classesQuery, offset, limit);
+
+      return {
+          page: options.page || 1,
+          limit: limit,
+          totalCount: totalCount,
+          data: data,
+          hasMore: hasMore,
+        }; 
+  
+  } catch (error) {
+
+    if (error.sqlMessage) {
+      throw new ForbiddenException(error.sqlMessage)
+    }
+
+    throw new ForbiddenException(error.message)
+  }
+}
+
+async findOneByID(id:number):Promise<Lesson>{
   try {
     const queryBuild = await this.LessonRepository.createQueryBuilder('lesson')
     .leftJoinAndSelect("lesson.Attendance" ,"Attendance")
@@ -159,6 +194,7 @@ async findOneByID(id:number){
     
   }
 }
+
 
 async updateOneByID(id:number){
   try {

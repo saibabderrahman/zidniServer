@@ -34,6 +34,22 @@ export class SubjectsController {
       const options = { page, limit };
       return this.subjectService.findAll(options);
     }
+    @Get('level')
+    @UsePipes(new ValidationPipe({
+      whitelist: true,
+      transform: true,
+    }))
+    async findAllLevel(
+      @Query('page', ParseIntPipe) page = 1,
+      @Query('limit', ParseIntPipe) limit = 10,
+      @Query('Category') Category :number,
+      @Query('IdEducation') IdEducation :number,
+
+        ) {
+      const options = { page, limit };
+      return this.subjectService.findByEducationAndLevel(options ,Category,IdEducation);
+    }
+
 
     @Get(':id')
     async findOne(@Param('id', ParseIntPipe) id: number): Promise<Subject> {

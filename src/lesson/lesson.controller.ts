@@ -32,6 +32,19 @@ export class LessonController {
         return data
       
     }
+    @Get("today")
+    async getLessonsToday(
+        @Query('page', ParseIntPipe) page = 1,
+        @Query('limit', ParseIntPipe) limit = 10,
+        @Query('id') id :number,
+  
+    ){
+        const options = { page, limit };
+
+        const data = await this.LessonService.getLessonsToday(options,id)
+        return data
+      
+    }
 
     
     @Put(":id")

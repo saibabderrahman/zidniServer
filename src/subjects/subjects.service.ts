@@ -45,7 +45,39 @@ export class SubjectsService {
             .leftJoinAndSelect('Subject.cycle', 'cycle')
             .leftJoinAndSelect('Subject.teacher', 'teacher')
             .leftJoinAndSelect('Subject.lessons', 'lessons')
+            const { limit , page } = options;
+            const offset = (page - 1) * limit || 0;
+            const { totalCount, hasMore, data } = await queryAndPaginate(queryBuild, offset, limit);
+
+            return {
+                page: options.page || 1,
+                limit: limit,
+                totalCount: totalCount,
+                data: data,
+                hasMore: hasMore,
+              }; 
+      
+        } catch (error) {
+            if(error.message){
+                throw new BadRequestException(error.message)
+            }
+            throw new BadRequestException(error.message)  
+
+            
+        }
         
+    }
+    async findByEducationAndLevel(options:Options ,idCategory:number,IdEducation:number){
+        try {
+            const queryBuild = await this.subjectRepository.createQueryBuilder('Subject')
+            .leftJoinAndSelect('Subject.Level', 'Level')
+            .leftJoinAndSelect('Subject.Category', 'Category')
+            .leftJoinAndSelect('Subject.cycle', 'cycle')
+            .leftJoinAndSelect('Subject.teacher', 'teacher')
+            .leftJoinAndSelect('Subject.lessons', 'lessons')
+            .where("cycle.id = :IdEducation",{IdEducation})
+            //.andWhere("Category.id = :idCategory" ,{idCategory})
+            .select('Subject')
             const { limit , page } = options;
             const offset = (page - 1) * limit || 0;
             const { totalCount, hasMore, data } = await queryAndPaginate(queryBuild, offset, limit);
@@ -69,8 +101,6 @@ export class SubjectsService {
         
     }
     async findOneByd(id:number){
-
-        
         try {
             const existingSubject = await this.subjectRepository.createQueryBuilder('Subject')
             .leftJoinAndSelect('Subject.Level', 'Level')
@@ -80,7 +110,6 @@ export class SubjectsService {
             .leftJoinAndSelect('Subject.teacher', 'teacher')
             .where('Subject.id = :id', { id })
             .getOne(); 
-    
             if (!existingSubject) {
               throw new NotFoundException('Subject not found');
             }

@@ -36,6 +36,10 @@ import { Educational_cycle } from './typeorm/entities/Educational_cycle';
 import { Subject } from './typeorm/entities/subject';
 import { SubjectsModule } from './subjects/subjects.module';
 import { UploadImageModule } from './upload-image/upload-image.module';
+import { Duties } from './typeorm/entities/duties';
+import { DutiesModule } from './duties/duties.module';
+import { Solution } from './typeorm/entities/solution';
+import { SolutionModule } from './solution/solution.module';
 
 
 @Module({
@@ -81,8 +85,8 @@ import { UploadImageModule } from './upload-image/upload-image.module';
       username: process.env.DATABASE_USERNAME,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      entities: [Subject  ,Teacher,Classes ,Type, Educational_cycle  ,Category , Levels,
-         User,Order ,Admin,Lesson,Attendance,Balance,AcaOrder],
+      entities: [Subject ,Solution ,Teacher,Classes ,Type, Educational_cycle  ,Category , Levels,
+         User,Order ,Admin,Lesson,Attendance,Balance,AcaOrder ,Duties ],
       synchronize: true,
     }),
     UsersModule,
@@ -97,7 +101,9 @@ import { UploadImageModule } from './upload-image/upload-image.module';
     AcaOrderModule,
     EducationalCycleModule,
     SubjectsModule,
-    UploadImageModule
+    UploadImageModule,
+    DutiesModule,
+    SolutionModule
   ],
   controllers: [AppController],
   providers: [AppService ,TranscodeConsumer],
