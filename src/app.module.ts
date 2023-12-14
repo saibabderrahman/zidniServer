@@ -40,6 +40,8 @@ import { Duties } from './typeorm/entities/duties';
 import { DutiesModule } from './duties/duties.module';
 import { Solution } from './typeorm/entities/solution';
 import { SolutionModule } from './solution/solution.module';
+import { Note } from './typeorm/entities/Notes';
+import { NoteModule } from './note/note.module';
 
 
 @Module({
@@ -85,7 +87,7 @@ import { SolutionModule } from './solution/solution.module';
       username: process.env.DATABASE_USERNAME,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      entities: [Subject ,Solution ,Teacher,Classes ,Type, Educational_cycle  ,Category , Levels,
+      entities: [Subject, Note ,Solution ,Teacher,Classes ,Type, Educational_cycle  ,Category , Levels,
          User,Order ,Admin,Lesson,Attendance,Balance,AcaOrder ,Duties ],
       synchronize: true,
     }),
@@ -103,7 +105,8 @@ import { SolutionModule } from './solution/solution.module';
     SubjectsModule,
     UploadImageModule,
     DutiesModule,
-    SolutionModule
+    SolutionModule,
+    NoteModule
   ],
   controllers: [AppController],
   providers: [AppService ,TranscodeConsumer],

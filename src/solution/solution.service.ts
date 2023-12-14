@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DutiesService } from 'src/duties/duties.service';
 import { Solution } from 'src/typeorm/entities/solution';
@@ -36,11 +36,23 @@ export class SolutionService {
             throw new BadRequestException(error.message || 'Failed to create solution.');
         }
     }
+    async getSolutionById(id: number ){
+        try {
+            const queryBuilder = await this.SolutionRepository.findOne({where:{id},relations:["notes"]})
+
+            if(!queryBuilder){
+                throw new NotFoundException("this solution not exists")
+            }
+            return queryBuilder
+        } catch (error) {
+
+            throw new BadRequestException(error.message || 'Failed to create solution.');
+        }
+    }
 
     async getSolutionByData(userId: number, dutiesId: number, options:Options){
         try {
             const queryBuilder = this.SolutionRepository.createQueryBuilder('solution');
-
             queryBuilder
                 .innerJoinAndSelect('solution.user', 'user')
                 .innerJoinAndSelect('solution.duties', 'duties')
@@ -52,6 +64,38 @@ export class SolutionService {
             if (dutiesId) {
                 queryBuilder.andWhere('duties.id = :dutiesId', { dutiesId });
             }
+            
+            const { limit , page } = options;
+            const offset = (page - 1) * limit || 0;
+            const { totalCount, hasMore, data } = await queryAndPaginate(queryBuilder, offset, limit);
+
+            return {
+                page: options.page || 1,
+                limit: limit,
+                totalCount: totalCount,
+                data: data,
+                hasMore: hasMore,
+              }; 
+        } catch (error) {
+            throw new BadRequestException(error.message || 'Failed to create solution.');
+        }
+    }
+
+    async getSolutionByLesson( data:{lesson: number, options:Options}){
+
+
+
+        const {lesson , options } = data
+        try {
+            const queryBuilder = await this.SolutionRepository.createQueryBuilder('solution');
+            queryBuilder
+                .innerJoinAndSelect('solution.user', 'user')
+                .leftJoinAndSelect('solution.notes', 'notes')
+                .innerJoinAndSelect('solution.duties', 'duties')
+                .innerJoinAndSelect('duties.lesson', 'lesson')
+
+                
+                .where('lesson.id = :lesson', {lesson})
             
             const { limit , page } = options;
             const offset = (page - 1) * limit || 0;

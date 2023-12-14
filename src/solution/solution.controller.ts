@@ -49,5 +49,18 @@ export class SolutionController {
       const queryBuilder =  await this.solutionService.getSolutionByData(userId,dutiesId,options);
       return queryBuilder
   }
+  @Get('lesson')
+
+  async getSolutionByLesson(
+    @Query('lesson') lesson: number,
+    @Query('page', ParseIntPipe) page = 1,
+    @Query('limit', ParseIntPipe) limit = 10,
+) {
+  const options = { page, limit };
+
+
+      const queryBuilder =  await this.solutionService.getSolutionByLesson({lesson,options});
+      return queryBuilder
+  }
 
 }

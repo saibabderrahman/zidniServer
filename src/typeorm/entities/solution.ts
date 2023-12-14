@@ -1,6 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne, ManyToOne, JoinColumn } from 'typeorm';
 import { Duties } from './duties';
 import { User } from './User';
+import { Note } from './Notes';
 
 @Entity()
 export class Solution {
@@ -14,6 +15,9 @@ export class Solution {
   duties:Duties;  
   @ManyToOne(() => User, (classes )=> classes.solutions)
   user:User;  
+  @OneToOne(() => Note , cat=>cat.solution)
+  @JoinColumn({name:"notesId"})
+  notes: Note;
   @Column({ default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 }

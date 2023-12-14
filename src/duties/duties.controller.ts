@@ -20,12 +20,13 @@ export class DutiesController {
   }
 
   @Get()
-  async getAllDuties(      @Query('page', ParseIntPipe) page = 1,
+  async getAllDuties(      
+  @Query('page', ParseIntPipe) page = 1,
   @Query('limit', ParseIntPipe) limit = 10,
+  @Query('lesson') lesson:number ,
     ) {
   const options = { page, limit };
-
-    return await this.dutiesService.getAllDuties(options);
+    return await this.dutiesService.getAllDuties({options,lesson});
   }
   @Get("user")
   async getAllDutiesByUser(      @Query('page', ParseIntPipe) page = 1,

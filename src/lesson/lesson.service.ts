@@ -62,6 +62,7 @@ async findAll(options:Options){
   try {
       const queryBuild = await this.LessonRepository.createQueryBuilder('lesson')
       .leftJoinAndSelect("lesson.subject" ,"subject")
+      .leftJoinAndSelect("lesson.duty" ,"duty")
       const { limit , page } = options;
       const offset = (page - 1) * limit || 0;
       const { totalCount, hasMore, data } = await queryAndPaginate(queryBuild, offset, limit);

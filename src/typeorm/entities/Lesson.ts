@@ -25,7 +25,7 @@ export class Lesson {
   Classes: Classes;
   @ManyToOne(() => Subject, (classes )=> classes.lessons)
   subject:Subject;
-  @OneToOne(() => Duties)
+  @OneToOne(() => Duties , cat=>cat.lesson)
   duty: Duties;
   @OneToMany(()=>Attendance,att=>att.Lesson)
   Attendance:Attendance[]

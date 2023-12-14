@@ -36,9 +36,16 @@ export class DutiesService {
     }
   }
 
-  async getAllDuties(options:Options) {
+  async getAllDuties(data:{options:Options,lesson:number}) {
+
+    const {options ,lesson} = data
     try {
       const classesQuery =await this.dutiesRepository.createQueryBuilder("Duties")
+      .leftJoinAndSelect('Duties.lesson',"lesson")
+
+      if(lesson){
+        classesQuery.where('lesson.id = :lesson' ,{lesson})
+      }
       const { limit , page } = options;
       const offset = (page - 1) * limit || 0;
       const { totalCount, hasMore, data } = await queryAndPaginate(classesQuery, offset, limit);
@@ -64,8 +71,36 @@ export class DutiesService {
       .leftJoinAndSelect("subject.cycle","cycle")
       .leftJoinAndSelect("cycle.orders","orders")
       .leftJoinAndSelect("orders.user","user")
+      .leftJoinAndSelect("Duties.solutions","solutions")
       .where("user.id = :id",{id})
-      .select(["lesson" ,"subject","Duties"])
+      .select(["lesson" ,"subject","Duties" ,"solutions"])
+      const { limit , page } = options;
+      const offset = (page - 1) * limit || 0;
+      const { totalCount, hasMore, data } = await queryAndPaginate(classesQuery, offset, limit);
+      return {
+        page: options.page || 1,
+        limit: limit,
+        totalCount: totalCount,
+        data: data,
+        hasMore: hasMore,
+      };   
+    } catch (error) {
+      if (error.sqlMessage) {
+        throw new ForbiddenException(error.sqlMessage)
+     }
+    throw new ForbiddenException(error.message)
+    }
+  }
+  async getAllDutiesByLessonID(options:Options ,id:number) {
+    try {
+      const classesQuery = await this.dutiesRepository.createQueryBuilder("Duties")
+      .leftJoinAndSelect('Duties.lesson',"lesson")
+      .leftJoinAndSelect("lesson.subject" ,"subject")
+      .leftJoinAndSelect("subject.cycle","cycle")
+      .leftJoinAndSelect("cycle.orders","orders")
+      .leftJoinAndSelect("Duties.solutions","solutions")
+      .where("lesson.id = :id",{id})
+      .select(["lesson" ,"subject","Duties" ,"solutions"])
       const { limit , page } = options;
       const offset = (page - 1) * limit || 0;
       const { totalCount, hasMore, data } = await queryAndPaginate(classesQuery, offset, limit);
