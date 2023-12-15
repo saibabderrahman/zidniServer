@@ -19,13 +19,13 @@ export class SolutionService {
     async create(data: { content: string, record: string, id: number, user: number }) {
         try {
             // Check if a solution with the same duties and user already exists
-            const existingSolution = await this.SolutionRepository.findOne({
-                where: { duties: { id: data.id }, user: { id: data.user } },
-            });
+      //    const existingSolution = await this.SolutionRepository.findOne({
+      //        where: { duties: { id: data.id }, user: { id: data.user } },
+      //    });
 
-            if (existingSolution) {
-                throw new BadRequestException('لقد قمت بالفعل بتقديم حل لهذا الواجب');
-            }
+      //    if (existingSolution) {
+      //        throw new BadRequestException('لقد قمت بالفعل بتقديم حل لهذا الواجب');
+      //    }
 
             const duties = await this.DutiesService.getDutyById(data.id);
             const user = await this.UsersService.findOne(data.user);
