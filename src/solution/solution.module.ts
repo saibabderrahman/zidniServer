@@ -30,7 +30,7 @@ const storage = multer.diskStorage({
       fileFilter: (req, file, callback) => {
 
         console.log({file})
-        if (file.mimetype === 'audio/mpeg' || file.mimetype === 'audio/mp3' || file.mimetype === 'audio/webm') {
+        if (file.mimetype === 'audio/mpeg' || file.mimetype === 'audio/mp3' || file.mimetype === 'audio/webm' || file.mimetype === 'audio/m4a') {
           callback(null, true);
         } else {
           callback(new BadRequestException('Invalid file type. Only MP3 files are allowed.'), false);
