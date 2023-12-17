@@ -14,8 +14,6 @@ const storage = multer.diskStorage({
     cb(null, path.join(__dirname, '../../src/upload'));
   },
   filename: function (req, file, cb) {
-    console.log({file})
-
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
     const filename = file.originalname.split('.')[0];
     cb(null, filename + '-' + uniqueSuffix + '.mp3');
@@ -28,8 +26,6 @@ const storage = multer.diskStorage({
     MulterModule.register({
       storage: storage,
       fileFilter: (req, file, callback) => {
-
-        console.log({file})
         if (file.mimetype === 'audio/mpeg' || file.mimetype === 'audio/mp3' || file.mimetype === 'audio/webm' || file.mimetype === 'audio/m4a') {
           callback(null, true);
         } else {

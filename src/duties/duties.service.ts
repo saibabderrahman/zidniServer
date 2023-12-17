@@ -42,6 +42,8 @@ export class DutiesService {
     try {
       const classesQuery =await this.dutiesRepository.createQueryBuilder("Duties")
       .leftJoinAndSelect('Duties.lesson',"lesson")
+      .orderBy('Duties.createdAt', 'DESC')
+
 
       if(lesson){
         classesQuery.where('lesson.id = :lesson' ,{lesson})

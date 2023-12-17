@@ -18,14 +18,12 @@ export class SolutionService {
 
     async create(data: { content: string, record: string, id: number, user: number }) {
         try {
-            // Check if a solution with the same duties and user already exists
-      //    const existingSolution = await this.SolutionRepository.findOne({
-      //        where: { duties: { id: data.id }, user: { id: data.user } },
-      //    });
-
-      //    if (existingSolution) {
-      //        throw new BadRequestException('لقد قمت بالفعل بتقديم حل لهذا الواجب');
-      //    }
+            const existingSolution = await this.SolutionRepository.findOne({
+                where: { duties: { id: data.id }, user: { id: data.user } },
+            })  
+            if (existingSolution) {
+                throw new BadRequestException('لقد قمت بالفعل بتقديم حل لهذا الواجب');
+            }
 
             const duties = await this.DutiesService.getDutyById(data.id);
             const user = await this.UsersService.findOne(data.user);
@@ -33,6 +31,31 @@ export class SolutionService {
             const solution = await this.SolutionRepository.create({ record, content, user, duties });
             return this.SolutionRepository.save(solution);
         } catch (error) {
+            throw new BadRequestException(error.message || 'Failed to create solution.');
+        }
+    }
+    async getSolutions(options:Options ){
+        try {
+            const queryBuilder = await this.SolutionRepository.createQueryBuilder('solution');
+            queryBuilder
+                .leftJoinAndSelect('solution.user', 'user')
+                .leftJoinAndSelect('solution.notes', 'notes')
+                .leftJoinAndSelect('solution.duties', 'duties')
+                .leftJoinAndSelect('duties.lesson', 'lesson')
+
+                const { limit , page } = options;
+                const offset = (page - 1) * limit || 0;
+                const { totalCount, hasMore, data } = await queryAndPaginate(queryBuilder, offset, limit);
+    
+                return {
+                    page: options.page || 1,
+                    limit: limit,
+                    totalCount: totalCount,
+                    data: data,
+                    hasMore: hasMore,
+                  }; 
+        } catch (error) {
+
             throw new BadRequestException(error.message || 'Failed to create solution.');
         }
     }
@@ -82,9 +105,6 @@ export class SolutionService {
     }
 
     async getSolutionByLesson( data:{lesson: number, options:Options}){
-
-
-
         const {lesson , options } = data
         try {
             const queryBuilder = await this.SolutionRepository.createQueryBuilder('solution');

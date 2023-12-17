@@ -31,6 +31,20 @@ export class SolutionController {
     return data
  
   }
+  @Get('all')
+  @UseGuards(JwtGuard)
+
+  async all(
+    @Query('page', ParseIntPipe) page = 1,
+    @Query('limit', ParseIntPipe) limit = 10,
+    @Req() Dto:any
+) {
+  const options = { page, limit };
+
+
+      const queryBuilder =  await this.solutionService.getSolutions(options);
+      return queryBuilder
+  }
 
   @Get('')
   @UseGuards(JwtGuard)
