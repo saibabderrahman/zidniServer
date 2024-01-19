@@ -9,12 +9,10 @@ interface TranscodeJobData {
   subject: string;
   template: string;
   context:object
-  // Add other properties if needed
 }
 @Processor(TRANSCODE_QUEUE)
 export class TranscodeConsumer {
   private readonly logger = new Logger(TranscodeConsumer.name);
-
   constructor(private readonly mailService:MailerService) {}
 
   @Process()

@@ -28,7 +28,6 @@ export class EducationalCycleDTO {
   @IsNumber()
   @IsOptional()
   id: number;
-
   @IsString()
   description: string;
   @IsArray()
@@ -37,9 +36,13 @@ export class EducationalCycleDTO {
   images: string[];
   @IsString()
   subDescription: string;
-
   @IsString()
+  @IsOptional()
   type: string;
+
+  @IsNumber()
+
+  type_Education:number
 
   @IsBoolean()
   show: boolean;

@@ -22,7 +22,7 @@ export class ClasseService {
            const data = await this.classRepository.save(classes)
            return data
         } catch (error) {
-            console.log(error);
+            ;
             if (error.sqlMessage) {
                 return error.sqlMessage;
             }
@@ -111,7 +111,7 @@ export class ClasseService {
             const data = await this.classRepository.delete({id})
             return {message:"class Delete Successfully"}
         } catch (error) {
-            console.log(error);
+            ;
             if (error.sqlMessage) {
                 return error.sqlMessage;
             }
@@ -123,7 +123,7 @@ export class ClasseService {
             const data = await this.classRepository.find({relations: ['teacher' , 'Level' ,"Category","Lessons"] })
             return data
         } catch (error) {
-            console.log(error);
+            ;
             if (error.sqlMessage) {
                 return error.sqlMessage;
             }

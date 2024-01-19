@@ -9,14 +9,6 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
-  @Get("sendmail")
-  sendmail(){
-    return this.appService.sendMAil();
-  }
 
-  @Post("transcode")
-  async transcode(){
-    return this.appService.transcode()
-  }
   
 }

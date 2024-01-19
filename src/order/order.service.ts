@@ -65,7 +65,7 @@ export class OrderService {
             return { message:"something not correct you can not signin in this group right now  "}
 
         } catch (error) {
-            console.log(error)
+            
             if(error.sqlMessage){
               return error.sqlMessage
             }
@@ -116,16 +116,13 @@ export class OrderService {
             throw new ForbiddenException('This class does not exist');
           }
       
-          // Use the transaction method to wrap all the operations in a single transaction
           const result = await this.ClassRepository.manager.transaction(async transactionalEntityManager => {
-            // Use Promise.all to parallelize the creation of orders
             const orders = await Promise.all(
               data.ids.map(async (id) => {
                 return this.createOrderForUser(id, classOrder, Teacher);
               })
             );
       
-            // Filter and count successful orders
             const successOrders = orders.filter((order) => order !== null);
             const successOrderCount = successOrders.length;
       
@@ -133,7 +130,6 @@ export class OrderService {
               throw new ForbiddenException("all this users are exist");
             }
       
-            // Save the classOrder after all the operations are complete
              const Class =  await transactionalEntityManager.save(classOrder);
       
             return { success: true,Class };
@@ -174,7 +170,7 @@ export class OrderService {
                 order.status = "paid"
                 return this.orderRepository.save(order)
         } catch (error) {
-            console.log(error)
+            
 
             if(error.sqlMessage){
                 return error.sqlMessage
@@ -197,7 +193,7 @@ export class OrderService {
 
             
         } catch (error) {
-            console.log(error)
+            
             if(error.sqlMessage){
                 return error.sqlMessage
               }
@@ -210,7 +206,7 @@ export class OrderService {
             const orders = await this.orderRepository.find({relations: ["balance","teacher"] ,where:{ type:"cash"}})
             return orders
         } catch (error) {
-            console.log(error)
+            
             if(error.sqlMessage){
                 return error.sqlMessage
               }
@@ -222,7 +218,7 @@ export class OrderService {
             const order = await this.orderRepository.findOne({relations: ["teacher","user","Class"] ,where:{id}})
             return {order,success:true}
         } catch (error) {
-            console.log(error)
+            
             if(error.sqlMessage){
                 return error.sqlMessage
               }
@@ -240,7 +236,7 @@ export class OrderService {
         }})
             return {orders, success:true }
         } catch (error) {
-            console.log(error)
+            
             if(error.sqlMessage){
                 return error.sqlMessage
               }
@@ -313,7 +309,7 @@ export class OrderService {
 
             
         } catch (error) {
-            console.log(error)
+            
             if(error.sqlMessage){
                 return error.sqlMessage
               }
@@ -345,7 +341,7 @@ export class OrderService {
             return{success:true , order}
             
         } catch (error) {
-            console.log(error)
+            
             if(error.sqlMessage){
                 return error.sqlMessage
               }

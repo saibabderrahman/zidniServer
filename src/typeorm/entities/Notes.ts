@@ -8,6 +8,8 @@ export class Note {
 
   @Column({ type:"longtext"  })
   note: string;
+  @Column({ type:"text" ,nullable:true })
+  record: string;
 
   @OneToOne(() => Solution , cat=>cat.notes)
   solution: Solution;

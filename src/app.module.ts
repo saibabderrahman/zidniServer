@@ -42,6 +42,8 @@ import { Solution } from './typeorm/entities/solution';
 import { SolutionModule } from './solution/solution.module';
 import { Note } from './typeorm/entities/Notes';
 import { NoteModule } from './note/note.module';
+import { Type_Education } from './typeorm/entities/typeOfEducation';
+import { TypeEducationModule } from './type_education/type_education.module';
 
 
 @Module({
@@ -61,7 +63,7 @@ import { NoteModule } from './note/note.module';
       useFactory: () => ({
         transport: {
           service: 'gmail',
-          secure: false,
+          secure: true,
           auth: {
             user: 'doondoon273@gmail.com',
             pass: 'jdrtjxfudnfurmpe',
@@ -88,7 +90,7 @@ import { NoteModule } from './note/note.module';
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
       entities: [Subject, Note ,Solution ,Teacher,Classes ,Type, Educational_cycle  ,Category , Levels,
-         User,Order ,Admin,Lesson,Attendance,Balance,AcaOrder ,Duties ],
+         User,Order ,Admin,Lesson,Attendance,Balance,AcaOrder ,Duties ,Type_Education ],
       synchronize: true,
     }),
     UsersModule,
@@ -106,7 +108,8 @@ import { NoteModule } from './note/note.module';
     UploadImageModule,
     DutiesModule,
     SolutionModule,
-    NoteModule
+    NoteModule,
+    TypeEducationModule
   ],
   controllers: [AppController],
   providers: [AppService ,TranscodeConsumer],

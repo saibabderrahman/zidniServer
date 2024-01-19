@@ -65,7 +65,6 @@ export class AdminService {
               return { admin: savedadmin, access_token };
           }    
       } catch (error) {
-        console.log(error)
         if(error.sqlMessage){
           return error.sqlMessage
         }
@@ -116,7 +115,7 @@ export class AdminService {
           const admins = await this.AdminRepository.find({ order: { id: 'DESC' } });            
             return { classes, levels, teachers, admins, users, orders, categories };
         } catch (error) {
-            console.log(error);
+            ;
             if (error.sqlMessage) {
                 return error.sqlMessage;
             }
@@ -138,7 +137,7 @@ export class AdminService {
       await this.classRepository.save(data)
       return {success :true , data}
       } catch (error) {
-        console.log(error);
+        ;
         if (error.sqlMessage) {
             return error.sqlMessage;
         }

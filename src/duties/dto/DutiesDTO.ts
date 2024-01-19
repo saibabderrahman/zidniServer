@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsNumber } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 
 export class DutiesDTO {
   @IsNotEmpty()
@@ -10,7 +10,12 @@ export class DutiesDTO {
   description: string;
 
   @IsNumber()
-  @IsNotEmpty()
+  @IsOptional()
   lesson: number;
+  @IsNumber()
+  @IsOptional()
+  level: number;
+
+  
 
 }

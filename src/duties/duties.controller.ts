@@ -24,9 +24,10 @@ export class DutiesController {
   @Query('page', ParseIntPipe) page = 1,
   @Query('limit', ParseIntPipe) limit = 10,
   @Query('lesson') lesson:number ,
+  @Query("level") level:number ,
     ) {
   const options = { page, limit };
-    return await this.dutiesService.getAllDuties({options,lesson});
+    return await this.dutiesService.getAllDuties({options,lesson,level});
   }
   @Get("user")
   async getAllDutiesByUser(      @Query('page', ParseIntPipe) page = 1,

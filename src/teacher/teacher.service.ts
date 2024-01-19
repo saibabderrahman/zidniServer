@@ -56,7 +56,6 @@ export class TeacherService {
                 return { teacher: savedTeacher, access_token };
             }    
         } catch (error) {
-          console.log(error)
           if(error.sqlMessage){
             return error.sqlMessage
           }

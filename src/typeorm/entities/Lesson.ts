@@ -1,10 +1,8 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne, OneToOne } from 'typeorm';
 import { Classes } from './Classes';
-import { Order } from './Order';
 import { Attendance } from './Attendance';
 import { Subject } from './subject';
 import { Duties } from './duties';
-import { Solution } from './solution';
 
 @Entity()
 export class Lesson {

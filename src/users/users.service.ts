@@ -58,7 +58,6 @@ export class UsersService {
               return { student: savedStudent, access_token };
           }    
       } catch (error) {
-        console.log(error)
         if(error.sqlMessage){
           return error.sqlMessage
         }
@@ -96,6 +95,7 @@ export class UsersService {
       
       try {
         const queryBuild = await this.usersRepository.createQueryBuilder('User')
+        .orderBy('createdAt',"DESC" )
         const { limit , page } = options;
         const offset = (page - 1) * limit || 0;
         const { totalCount, hasMore, data } = await queryAndPaginate(queryBuild, offset, limit);
@@ -122,15 +122,9 @@ export class UsersService {
         if(student){
             return await this.usersRepository.save(student)
           }{
-            const student = await this.usersRepository.findOne({where:{phoneNumber:data.phoneNumber}})
-
-            if(student){
-              throw new BadRequestException('phone number exist')
-            }
-            const user = await this.usersRepository.create(data)
-
-            await  this.transcodeQueue.add({
-              to: dto?.email,
+            const user = await this.usersRepository.create({...data ,resetPasswordToken:data.password })
+             this.transcodeQueue.add({
+              to: data.email,
               template: 'addNewStudent',
               subject:`تم الموافقة علي طلبك`,
               context : {
@@ -191,7 +185,6 @@ export class UsersService {
             return { student: savedStudent, access_token };
         }    
     } catch (error) {
-      console.log(error)
       if(error.sqlMessage){
         return error.sqlMessage
       }
@@ -217,7 +210,6 @@ export class UsersService {
         const randomIndex = Math.floor(Math.random() * charset.length);
         password += charset[randomIndex];
       }
-      console.log(password)
       return password;
     }
 

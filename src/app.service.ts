@@ -13,16 +13,5 @@ export class AppService {
   getHello(): string {
     return 'Hello World!';
   }
- async sendMAil(){
-  await this.transcodeQueue.add({
-    to:"saibabderrahman@gmail.com",
-    template: 'email',
-    subject:"hi there"
-  });
-  }
 
-  async transcode() {
-    await this.transcodeQueue.add({
-      fileName: './file.mp3',
-    });  }
 }

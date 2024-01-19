@@ -1,6 +1,7 @@
 import { IsString, IsBoolean, IsArray, IsNumber, IsOptional, IsNotEmpty } from 'class-validator';
 import { EducationalCycleDTO } from 'src/educational_cycle/dto/EducationalCycleDTO';
 import { TeacherDto } from 'src/teacher/Dto';
+import { Educational_cycle } from 'src/typeorm/entities/Educational_cycle';
 
 
 export class CategoryDto{
@@ -46,7 +47,7 @@ export class CreateSubjectDTO {
   @IsOptional()
   ratings?: number;
   @IsNotEmpty()
-  cycle:EducationalCycleDTO
+  cycle:Educational_cycle
   @IsOptional()
   teacher: TeacherDto;
   @IsNumber()

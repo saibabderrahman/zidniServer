@@ -26,6 +26,7 @@ const storage = multer.diskStorage({
     MulterModule.register({
       storage: storage,
       fileFilter: (req, file, callback) => {
+        console.log({file})
         if (file.mimetype === 'audio/mpeg' || file.mimetype === 'audio/mp3' || file.mimetype === 'audio/webm' || file.mimetype === 'audio/m4a') {
           callback(null, true);
         } else {

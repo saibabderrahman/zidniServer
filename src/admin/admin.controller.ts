@@ -15,7 +15,6 @@ export class AdminController {
     @Post("signUp")
     @UseInterceptors(FileInterceptor('file'))
     async AdminSignUp(@Res() res:Response,@UploadedFile() file: Express.Multer.File , @Body() Dto:AdminDto){
-        console.log(Dto)
              if(file){
               Dto.avatar=  file.filename
              }

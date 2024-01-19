@@ -21,6 +21,7 @@ export class SolutionService {
             const existingSolution = await this.SolutionRepository.findOne({
                 where: { duties: { id: data.id }, user: { id: data.user } },
             })  
+            console.log(existingSolution)
             if (existingSolution) {
                 throw new BadRequestException('لقد قمت بالفعل بتقديم حل لهذا الواجب');
             }
@@ -41,8 +42,7 @@ export class SolutionService {
                 .leftJoinAndSelect('solution.user', 'user')
                 .leftJoinAndSelect('solution.notes', 'notes')
                 .leftJoinAndSelect('solution.duties', 'duties')
-                .leftJoinAndSelect('duties.lesson', 'lesson')
-
+                .orderBy('solution.createdAt', 'DESC')
                 const { limit , page } = options;
                 const offset = (page - 1) * limit || 0;
                 const { totalCount, hasMore, data } = await queryAndPaginate(queryBuilder, offset, limit);
