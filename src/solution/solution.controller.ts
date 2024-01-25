@@ -12,8 +12,8 @@ export class SolutionController {
   constructor(private readonly solutionService: SolutionService) {}
 
   @Post('')
-  @UseInterceptors(FileInterceptor('audioFile'))
   @UseGuards(JwtGuard)
+  @UseInterceptors(FileInterceptor('audioFile'))
   async createSolution(@Body() createSolutionDto: CreateSolutionDto ,@UploadedFile() audioFile: Express.Multer.File ,@Req() Dto:any) {
     let record =  ""
 

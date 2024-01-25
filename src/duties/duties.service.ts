@@ -45,7 +45,6 @@ export class DutiesService {
   }
 
   async getAllDuties(data:{options:Options,lesson:number ,level:number}) {
-
     const {options ,lesson,level} = data
     try {
       const classesQuery =await this.dutiesRepository.createQueryBuilder("Duties")
@@ -53,8 +52,6 @@ export class DutiesService {
       .leftJoinAndSelect('Duties.level',"level")
       .leftJoinAndSelect('level.type',"type")
       .orderBy('Duties.createdAt', 'DESC')
-
-
       if(lesson){
         classesQuery.where('lesson.id = :lesson' ,{lesson})
       }
@@ -79,7 +76,6 @@ export class DutiesService {
     }
   }
   async getAllDutiesByUserID(options: Options, id: number) {
-    console.log(id);
     try {
       const dutiesQuery = await this.dutiesRepository.createQueryBuilder("Duties")
         .leftJoinAndSelect('Duties.lesson', 'lesson')
@@ -92,6 +88,36 @@ export class DutiesService {
         .andWhere('solutionUser.id IS NULL OR solutionUser.id != :id', { id })
         .orderBy('Duties.createdAt', 'DESC')
         .select(['lesson', 'subject', 'Duties', 'solutions']);
+  
+      const { limit, page } = options;
+      const offset = (page - 1) * limit || 0;
+      const { totalCount, hasMore, data } = await queryAndPaginate(dutiesQuery, offset, limit);
+  
+      return {
+        page: options.page || 1,
+        limit: limit,
+        totalCount: totalCount,
+        data: data,
+        hasMore: hasMore,
+      };
+    } catch (error) {
+      console.error(error);
+  
+      if (error.sqlMessage) {
+        throw new ForbiddenException(error.sqlMessage);
+      }
+  
+      throw new ForbiddenException(error.message);
+    }
+  }
+  async getAllDutiesByUser(options: Options, id: number) {
+    try {
+      const dutiesQuery = await this.dutiesRepository.createQueryBuilder("Duties")
+        .leftJoinAndSelect('Duties.level', 'level')
+        .leftJoinAndSelect('Duties.solutions', 'solutions')
+        .leftJoinAndSelect('solutions.user', 'user')
+        .where('user.id = :id', { id })
+        .orderBy('Duties.createdAt', 'DESC')
   
       const { limit, page } = options;
       const offset = (page - 1) * limit || 0;

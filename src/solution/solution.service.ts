@@ -21,7 +21,6 @@ export class SolutionService {
             const existingSolution = await this.SolutionRepository.findOne({
                 where: { duties: { id: data.id }, user: { id: data.user } },
             })  
-            console.log(existingSolution)
             if (existingSolution) {
                 throw new BadRequestException('لقد قمت بالفعل بتقديم حل لهذا الواجب');
             }

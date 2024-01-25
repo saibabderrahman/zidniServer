@@ -260,7 +260,6 @@ export class OrderService {
              }
 
             const teacher = await this.TeacherRepository.findOne({where:{id:order.teacher.id},relations:["balance"]})
-            console.log({teacher})
 
 
             order.status= "end"
@@ -269,10 +268,8 @@ export class OrderService {
 
                 teacher.availableBalance = Number(teacher.availableBalance) + Number(order.TeacherPrice)
                  const balance =  teacher.balance.find((el)=>el.status === "notWithdrawable")
-                 console.log(balance)
 
                  if(!balance?.id){
-                    console.log({teacher})
                     const data = {
                         priceTotal:order.TeacherPrice,
                     }

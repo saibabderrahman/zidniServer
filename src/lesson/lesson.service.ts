@@ -243,7 +243,6 @@ async updateOneByID(id:number){
     .andWhere('lesson.state = :state', { state: 'start' })
     .select('class.id')
     .getQuery();
-    console.log(subQuery)
 
   const classes = await this.ClassRepository.createQueryBuilder('class')
     .leftJoinAndSelect('class.teacher', 'teacher')
