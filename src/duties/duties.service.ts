@@ -115,9 +115,11 @@ export class DutiesService {
       const dutiesQuery = await this.dutiesRepository.createQueryBuilder("Duties")
         .leftJoinAndSelect('Duties.level', 'level')
         .leftJoinAndSelect('Duties.solutions', 'solutions')
+        .leftJoinAndSelect('solutions.notes', 'note')
         .leftJoinAndSelect('solutions.user', 'user')
         .where('user.id = :id', { id })
         .orderBy('Duties.createdAt', 'DESC')
+        .select(['Duties' ,"solutions","note"])
   
       const { limit, page } = options;
       const offset = (page - 1) * limit || 0;
@@ -131,7 +133,6 @@ export class DutiesService {
         hasMore: hasMore,
       };
     } catch (error) {
-      console.error(error);
   
       if (error.sqlMessage) {
         throw new ForbiddenException(error.sqlMessage);

@@ -124,12 +124,14 @@ export class LevelsService {
             // Level with the specified id not found
             return null;
           }
+          const type_Education =   await this.TypeEducation.findOne(dto.type)
+
           // Modify the properties of the Level with the updated values
           Level.name = dto.name;
           Level.slug = dto.slug;
       
           // Save the modified Level back to the database
-          const updatedLevel = await this.levelRepository.save(Level);
+          const updatedLevel = await this.levelRepository.save({...Level,type:type_Education});
       
           return updatedLevel;
         } catch (error) {

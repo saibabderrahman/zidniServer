@@ -39,8 +39,7 @@ export class TypeEducationController {
         whitelist: true,
         transform: true,
       }))
-     @UseGuards(new JwtGuard)
-  
+    @UseGuards(new JwtGuard)
     async update(@Param('id', ParseIntPipe) id: number,@Body() dto:TypeEducationDto ){
         dto.id= id
         const data = await this.type_EducationService.update(dto)

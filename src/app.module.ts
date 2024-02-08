@@ -109,7 +109,7 @@ import { TypeEducationModule } from './type_education/type_education.module';
     DutiesModule,
     SolutionModule,
     NoteModule,
-    TypeEducationModule
+    TypeEducationModule,
   ],
   controllers: [AppController],
   providers: [AppService ,TranscodeConsumer],

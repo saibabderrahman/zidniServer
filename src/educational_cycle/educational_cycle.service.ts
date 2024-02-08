@@ -43,7 +43,7 @@ export class EducationalCycleService {
 
     async findAll(options:Options) {
         const queryBuild = await this.educationRepository.createQueryBuilder('Educational_cycle')
-        .leftJoinAndSelect('Educational_cycle.orders', 'orders')
+       // .leftJoinAndSelect('Educational_cycle.orders', 'orders')
         .leftJoinAndSelect('Educational_cycle.type_Education', 'type_Education')
         .orderBy('Educational_cycle.id', 'DESC')
 
@@ -64,13 +64,12 @@ export class EducationalCycleService {
 
     async findOne(id: number): Promise<Educational_cycle> {
         const queryBuild = await this.educationRepository.createQueryBuilder('Educational_cycle')
-        .leftJoinAndSelect('Educational_cycle.orders', 'orders')
         .leftJoinAndSelect('Educational_cycle.subjects', 'subjects')
         .leftJoinAndSelect('Educational_cycle.type_Education', 'type_Education')
         .leftJoinAndSelect('subjects.lessons', 'lessons')
         .leftJoinAndSelect('subjects.Level', 'Level')
-        .leftJoinAndSelect('subjects.Category', 'Category')
         .leftJoinAndSelect('subjects.teacher', 'teacher')
+        .select(["Educational_cycle","type_Education"])
         .where("Educational_cycle.id = :id" ,{id})
         .getOne()
         if (!queryBuild) {
@@ -83,6 +82,7 @@ export class EducationalCycleService {
         .leftJoinAndSelect('Educational_cycle.orders', 'orders')
         .leftJoinAndSelect('orders.user', 'user')
         .leftJoinAndSelect('Educational_cycle.subjects', 'subjects')
+        .select(['Educational_cycle' ,"subjects"])
         .where("user.id = :id" ,{id})
         .select(["Educational_cycle" ,"subjects"])
         .getMany()

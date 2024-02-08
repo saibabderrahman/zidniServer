@@ -16,6 +16,8 @@ export class Levels {
   createdAt: Date;
   @ManyToOne(() => Type_Education, classes => classes.levels)
   type: Type;
+  @Column({ default:true})
+  state: boolean;
   @OneToMany(() => Classes, classes => classes.Category)
   catClasses: Classes[];
   @OneToMany(() => Duties, classes => classes.level)

@@ -14,6 +14,9 @@ export class Type_Education {
   Educational_cycles:Educational_cycle;
   @OneToMany(() => Levels, (classes )=> classes.type)
   levels:Levels;
+  @Column({ default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
+
 
 
 
