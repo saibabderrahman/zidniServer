@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, UsePipes, ValidationPipe, Query, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, UsePipes, ValidationPipe, Query, ParseIntPipe, Patch } from '@nestjs/common';
 import { Educational_cycle } from 'src/typeorm/entities/Educational_cycle';
 import { EducationalCycleService } from './educational_cycle.service';
 import { EducationalCycleDTO } from './dto/EducationalCycleDTO';
@@ -12,12 +12,12 @@ export class EducationalCycleController {
         whitelist: true,
         transform: true,
       }))
-    create(@Body() data: EducationalCycleDTO): Promise<Educational_cycle> {
+      async create(@Body() data: EducationalCycleDTO): Promise<Educational_cycle> {
         return this.educationalCycleService.create(data);
     }
 
     @Get()
-    findAll(
+    async findAll(
         @Query('page', ParseIntPipe) page = 1,
         @Query('limit', ParseIntPipe) limit = 10,
   
@@ -25,23 +25,40 @@ export class EducationalCycleController {
         const options = { page, limit };
         return this.educationalCycleService.findAll(options);
     }
+    @Get("all")
+    async findAllFrontEnd(
+        @Query('page', ParseIntPipe) page = 1,
+        @Query('limit', ParseIntPipe) limit = 10,
+  
+    ) {
+        const options = { page, limit };
+        return this.educationalCycleService.findFrontEnd(options);
+    }
+
+
+
     @Get('student/:id')
-    findOneByStudnet(@Param('id') id: number): Promise<Educational_cycle []> {
+    async findOneByStudnet(@Param('id') id: number): Promise<Educational_cycle []> {
         return this.educationalCycleService.findOneStudent(id);
     }
 
     @Get(':id')
-    findOne(@Param('id') id: number): Promise<Educational_cycle> {
+    async findOne(@Param('id') id: number): Promise<Educational_cycle> {
+
         return this.educationalCycleService.findOne(id);
     }
 
     @Put(':id')
-    update(@Param('id') id: number, @Body() data: Educational_cycle): Promise<Educational_cycle> {
+    async  update(@Param('id') id: number, @Body() data: Educational_cycle): Promise<Educational_cycle> {
         return this.educationalCycleService.update(id, data);
+    }
+    @Patch(':id')
+    async hide(@Param('id') id: number): Promise<void> {
+        return this.educationalCycleService.hideOne(id);
     }
 
     @Delete(':id')
-    remove(@Param('id') id: number): Promise<void> {
+    async remove(@Param('id') id: number): Promise<void> {
         return this.educationalCycleService.remove(id);
     }
 }

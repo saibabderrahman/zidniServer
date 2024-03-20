@@ -12,23 +12,20 @@ export class Educational_cycle {
   name: string;
   @Column('simple-array', { nullable: true })
   images:string[] = [];
-
-  @Column({type:"longtext"})
+  @Column({type:"longtext" ,nullable:true})
   subDescription: string;
-  @Column({type:"longtext"})
+  @Column({type:"longtext" ,nullable:true})
   description: string;
-  @Column({ })
+  @Column({nullable:true})
   type: string;
-  @Column({ default: false })
+  @Column({ default: true })
   show: boolean;
+  @Column({ default: true })
+  status: boolean;
   @Column()
   time: string;
   @Column({ nullable: false })
   price: number;
-  @Column({ nullable: true })
-  comparAtPrice: number;
-  @Column({ nullable: true })
-  tags: string;
   @Column({ nullable: true ,default: 5 })
   ratings: number;
   @Column({ default: 0 })
@@ -43,14 +40,14 @@ export class Educational_cycle {
   orders:AcaOrder[]
   @Column('simple-array', { nullable: true })
   studentIds: number[] = [];
+  @Column('simple-array', { nullable: true })
+  levels:string[];
   @OneToMany(() => Subject, classes => classes.cycle)
   subjects: Subject[];
   @Column({ default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
   @Column({ default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
-
-
   @BeforeInsert()
   async addAvailableSeates() {
       this.seatsAvailable = this.seatsTotal;

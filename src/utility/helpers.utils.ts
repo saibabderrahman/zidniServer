@@ -37,19 +37,13 @@ export function filterNullEmptyPropertiesInArray(arr: any[]): any[] {
   }
 
 
-  export async function queryAndPaginate(queryBuilder, offset, limit) {
-    const totalCount = await queryBuilder.getCount();
-    const hasMore = totalCount > offset + limit;
-    queryBuilder.skip(offset).take(limit);
-    const data = await queryBuilder.getMany();
-    return { totalCount, hasMore, data };
-  }
-
-
-  
-
-
-
+ export async function queryAndPaginate(queryBuilder, offset, limit) {
+   const totalCount = await queryBuilder.getCount();
+   const hasMore = totalCount > offset + limit;
+   queryBuilder.skip(offset).take(limit);
+   const data = await queryBuilder.getMany();
+   return { totalCount, hasMore, data };
+ }
 export function validateOrderState(orderState: string, validStates: string[]): void {
   if (!validStates.includes(orderState)) {
     throw new ForbiddenException(`Sorry, you can't update the order in its current state. It must be one of: ${validStates.join(', ')}`);

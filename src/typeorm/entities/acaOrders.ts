@@ -10,21 +10,21 @@ export class AcaOrder {
   id: number;
   @Column()
   firstName:string
-  @Column()
+  @Column({nullable:true})
   lastName:string
-  @Column()
+  @Column({nullable:true})
   email:string
   @OneToMany(()=>Attendance , att => att.order)
   Attendance:Attendance[]
-  @Column()
+  @Column({nullable:true})
   image:string
-  @Column()
+  @Column({nullable:true})
   price:number
   @Column()
   phoneNumber:string
   @Column({nullable:true})
   cart:string
-  @Column({default:"in person"})
+  @Column({nullable:true})
   type:string
   @Column({ default: 'notPaid' })
   status: string;

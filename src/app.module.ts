@@ -44,6 +44,7 @@ import { Note } from './typeorm/entities/Notes';
 import { NoteModule } from './note/note.module';
 import { Type_Education } from './typeorm/entities/typeOfEducation';
 import { TypeEducationModule } from './type_education/type_education.module';
+import { QuranTafseerModule } from './quran-tafseer/quran-tafseer.module';
 
 
 @Module({
@@ -110,6 +111,7 @@ import { TypeEducationModule } from './type_education/type_education.module';
     SolutionModule,
     NoteModule,
     TypeEducationModule,
+    QuranTafseerModule,
   ],
   controllers: [AppController],
   providers: [AppService ,TranscodeConsumer],

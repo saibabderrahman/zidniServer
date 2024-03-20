@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, UsePipes, ValidationPipe, Query, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, UsePipes, ValidationPipe, Query, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { AcaOrderService } from './aca-order.service';
 import { AcaOrderDto } from './dto/AcaOrderDto ';
 import { AcaOrder } from 'src/typeorm/entities/acaOrders';
+import { JwtGuard } from 'src/admin/Guard';
 
 @Controller('aca-orders')
 export class AcaOrderController {
@@ -13,16 +14,16 @@ export class AcaOrderController {
     transform: true,
   }))
   async createAcaOrder(@Body() orderDto: AcaOrderDto) {
-    return this.acaOrderService.createAcaOrder(orderDto);
+    return await this.acaOrderService.createAcaOrder(orderDto);
   }
 
   @Get()
+  @UseGuards(new JwtGuard)
   async getAllAcaOrders(
     @Query('page', ParseIntPipe) page = 1,
     @Query('limit', ParseIntPipe) limit = 10,
       ) {
     const options = { page, limit };
-
     return this.acaOrderService.findAllAcaOrders(options);
   }
   @Get("some")

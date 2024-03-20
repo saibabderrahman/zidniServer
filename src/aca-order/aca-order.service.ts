@@ -6,6 +6,8 @@ import { AcaOrderDto } from './dto/AcaOrderDto ';
 import {EducationalCycleService} from "../educational_cycle/educational_cycle.service"
 import { UsersService } from 'src/users/users.service';
 import { Options, queryAndPaginate } from 'src/utility/helpers.utils';
+import { HttpException, HttpStatus } from '@nestjs/common';
+
 
 
 @Injectable()
@@ -20,30 +22,32 @@ export class AcaOrderService {
   async createAcaOrder(orderDto: AcaOrderDto) {
     try {
       const educational_cycle = await this.EducationalCycleService.findOne(orderDto.educational_cycle)
-      if(!educational_cycle){
+      if (!educational_cycle) {
         throw new BadRequestException('الدورة التدريبية التي تريد المشاركة فيها غير موجودة')
       }
-      if(educational_cycle.seatsAvailable === 0){
-        throw new BadRequestException('لا يوجد مقاعد متاحة في هذه الدوورة')
+      if (educational_cycle.seatsAvailable === 0) {
+        throw new BadRequestException('لا يوجد مقاعد متاحة في هذه الدورة')
       }
       const existingOrder = await this.acaOrderRepository
-      .createQueryBuilder('order')
-      .leftJoinAndSelect("order.educational_cycle" ,"educational_cycle")
-      .where('order.email = :email', { email: orderDto.email })
-      //.andWhere('order.phoneNumber = :phoneNumber', { phoneNumber: orderDto.phoneNumber })
-      .andWhere('educational_cycle.id = :id', { id: orderDto.educational_cycle })
-      .getOne();
+        .createQueryBuilder('order')
+        .leftJoinAndSelect("order.educational_cycle", "educational_cycle")
+        .where('order.email = :email', { email: orderDto.email })
+        //.andWhere('order.phoneNumber = :phoneNumber', { phoneNumber: orderDto.phoneNumber })
+        .andWhere('educational_cycle.id = :id', { id: orderDto.educational_cycle })
+        .getOne()
       if (existingOrder) {
         throw new BadRequestException('هناك طلب مسبق بنفس البريد الإلكتروني ورقم الهاتف والدورة التدريبية.');
       }
+  
       const NewOrder = {
-        ...orderDto,price:educational_cycle.price ,educational_cycle
+        ...orderDto, price: educational_cycle.price, educational_cycle
       }
       return await this.acaOrderRepository.save(NewOrder);
     } catch (error) {
-      throw new BadRequestException(error) 
+      throw error
     }
   }
+  
   async calculateTotalPaidToday(): Promise<number> {
     try {
       const today = new Date();

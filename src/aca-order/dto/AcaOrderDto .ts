@@ -3,37 +3,27 @@ import { IsString, IsEmail, IsEnum, IsOptional, IsDate, IsPhoneNumber, IsNumber,
 export class AcaOrderDto {
   @IsOptional()
   id: number;
-
   @IsString()
   firstName: string;
-
   @IsString()
   lastName: string;
-
   @IsEmail()
+  @IsOptional()
   email: string;
-
   @IsPhoneNumber(null, { message: 'Invalid phone number' })
   @IsString()
   phoneNumber: string;
-
   @IsNumber()
   educational_cycle: number;
-
   @IsString()
+  @IsOptional()
   cart:string
   @IsString()
   @IsOptional()
-
   level:string
-
-
-
   @IsString()
   @IsOptional()
-
   type: string;
-
   @IsString()
   @IsOptional()
   status: string;
@@ -47,6 +37,7 @@ export class AcaOrderDto {
   @IsOptional()
   educationLevel: string; 
   @IsString()
+  @IsOptional()
   image:string
   @IsString()
   @IsOptional()

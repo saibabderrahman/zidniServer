@@ -13,8 +13,7 @@ export class EducationalCycleService {
 
     ) {}
 
-    async create(data: EducationalCycleDTO): Promise<Educational_cycle> {
-        
+    async create(data: EducationalCycleDTO): Promise<Educational_cycle> { 
     try {
         const type_Education =   await this.TypeEducation.findOne(data.type_Education)
         const educational_cycle = await this.educationRepository.create({...data,type_Education});
@@ -28,9 +27,7 @@ export class EducationalCycleService {
     }
     }
     async save(data: Educational_cycle): Promise<Educational_cycle> {
-        
         try {
-
             return await this.educationRepository.save({...data});
         } catch (error) {
             if (error.message) {
@@ -43,9 +40,29 @@ export class EducationalCycleService {
 
     async findAll(options:Options) {
         const queryBuild = await this.educationRepository.createQueryBuilder('Educational_cycle')
+        .leftJoinAndSelect('Educational_cycle.type_Education', 'type_Education')
+        .orderBy('Educational_cycle.createdAt', 'DESC')
+
+        const { limit , page } = options;
+        const offset = (page - 1) * limit || 0;
+        const { totalCount, hasMore, data } = await queryAndPaginate(queryBuild, offset, limit);
+
+        return {
+            page: options.page || 1,
+            limit: limit,
+            totalCount: totalCount,
+            data: data,
+            hasMore: hasMore,
+          }; 
+  
+
+    }
+    async findFrontEnd(options:Options) {
+        const queryBuild = await this.educationRepository.createQueryBuilder('Educational_cycle')
        // .leftJoinAndSelect('Educational_cycle.orders', 'orders')
         .leftJoinAndSelect('Educational_cycle.type_Education', 'type_Education')
-        .orderBy('Educational_cycle.id', 'DESC')
+        .where("Educational_cycle.status = true")
+        .orderBy('Educational_cycle.createdAt', 'DESC')
 
         const { limit , page } = options;
         const offset = (page - 1) * limit || 0;
@@ -62,18 +79,27 @@ export class EducationalCycleService {
 
     }
 
+
+    async hideOne(id:number):Promise<void>{
+        try {
+            const educational = await this.findOne(id)
+            await this.educationRepository.save({...educational,status:!educational.status})
+        } catch (error) {
+            throw error
+            
+        }
+
+    }
+
     async findOne(id: number): Promise<Educational_cycle> {
         const queryBuild = await this.educationRepository.createQueryBuilder('Educational_cycle')
-        .leftJoinAndSelect('Educational_cycle.subjects', 'subjects')
         .leftJoinAndSelect('Educational_cycle.type_Education', 'type_Education')
-        .leftJoinAndSelect('subjects.lessons', 'lessons')
-        .leftJoinAndSelect('subjects.Level', 'Level')
-        .leftJoinAndSelect('subjects.teacher', 'teacher')
         .select(["Educational_cycle","type_Education"])
         .where("Educational_cycle.id = :id" ,{id})
+        //.andWhere("Educational_cycle.status = true" )
         .getOne()
         if (!queryBuild) {
-            throw new NotFoundException(`Educational_cycle with ID ${id} not found`);
+            throw new NotFoundException(`الدورة التدريبية  غير موجودة`);
         }
         return queryBuild;
     }
