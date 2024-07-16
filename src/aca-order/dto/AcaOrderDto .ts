@@ -26,6 +26,12 @@ export class AcaOrderDto {
   type: string;
   @IsString()
   @IsOptional()
+  wilaya: string;
+  @IsString()
+  @IsOptional()
+  commune: string;
+  @IsString()
+  @IsOptional()
   status: string;
   @IsString()
   @IsOptional()

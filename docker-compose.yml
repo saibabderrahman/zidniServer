@@ -11,6 +11,8 @@ services:
  backend:
   restart: always
   build: .
+  volumes:
+   - upload_data:/app/upload
   env_file:
    - ./.env
  database:
@@ -19,8 +21,8 @@ services:
   environment:
     - MYSQL_ROOT_PASSWORD=dzMagazinilocalhost5000
     - MYSQL_DATABASE=zidni
-##  ports:
-##   - "3306:3306"
+  ports:
+   - "3306:3306"
   volumes:
     - mysql_data:/var/lib/mysql
  redis:

@@ -45,6 +45,10 @@ export class AcaOrder {
   @Column({ nullable: true })
   school: string;
   @Column({ nullable: true })
+  wilaya: string;
+  @Column({ nullable: true })
+  commune: string;
+  @Column({ nullable: true })
   memorizationValue: string; 
   @Column({ nullable: true })
   fatherName: string; 

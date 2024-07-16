@@ -5,13 +5,14 @@ import { soar } from './sowar';
 
 @Injectable()
 export class QuranTafseerService {
-  private readonly apiUrl = 'https://archive.org/download/211_20240311';
+  //private readonly apiUrl = 'https://archive.org/download/482_20240311';
+   private readonly apiUrl = 'https://archive.org/download/504_20240407';
 
   constructor() {}
 
   async getTafseerData(): Promise<any> {
     let requests = [];
-    for (let ayah = 201; ayah <= 300; ayah++) {
+    for (let ayah = 501; ayah <= 604; ayah++) {
       const url = `${this.apiUrl}/${ayah}.mp3`;
      // const response = await axios.get(url).then(response => response.data.verses);
       requests.push({

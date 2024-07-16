@@ -45,11 +45,18 @@ import { NoteModule } from './note/note.module';
 import { Type_Education } from './typeorm/entities/typeOfEducation';
 import { TypeEducationModule } from './type_education/type_education.module';
 import { QuranTafseerModule } from './quran-tafseer/quran-tafseer.module';
+import { StatesModule } from './states/states.module';
+import { FacebookPixelModule } from './facebook-pixel/facebook-pixel.module';
+import { Commune, FacebookPixel, RegistrationState, Wilaya } from './typeorm/entities';
+import { Logger } from 'winston';
+import { LoggerService } from './logger.service';
+import { TelegramModule } from './telegram/telegram.module';
+import { RegistrationStateModule } from './registration-state/registration-state.module';
+
 
 
 @Module({
   imports: [
-
     BullModule.forRoot({
       redis: {
         host: 'redis',
@@ -59,7 +66,10 @@ import { QuranTafseerModule } from './quran-tafseer/quran-tafseer.module';
     BullModule.registerQueue({
       name:TRANSCODE_QUEUE,
     }),
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      envFilePath: '.env',
+      isGlobal: true,
+    }),
     MailerModule.forRootAsync({
       useFactory: () => ({
         transport: {
@@ -82,7 +92,6 @@ import { QuranTafseerModule } from './quran-tafseer/quran-tafseer.module';
         },
       }),
     }),
-
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: process.env.DATABASE_HOST,
@@ -90,8 +99,8 @@ import { QuranTafseerModule } from './quran-tafseer/quran-tafseer.module';
       username: process.env.DATABASE_USERNAME,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      entities: [Subject, Note ,Solution ,Teacher,Classes ,Type, Educational_cycle  ,Category , Levels,
-         User,Order ,Admin,Lesson,Attendance,Balance,AcaOrder ,Duties ,Type_Education ],
+      entities: [Subject, Note,RegistrationState ,Solution ,Teacher,Classes ,Type, Educational_cycle  ,Category , Levels,
+         User,Order ,Admin,Lesson,Attendance,Balance,AcaOrder ,Duties ,Type_Education ,Wilaya,Commune,FacebookPixel],
       synchronize: true,
     }),
     UsersModule,
@@ -112,8 +121,18 @@ import { QuranTafseerModule } from './quran-tafseer/quran-tafseer.module';
     NoteModule,
     TypeEducationModule,
     QuranTafseerModule,
+    StatesModule,
+    FacebookPixelModule,
+    TelegramModule,
+    RegistrationStateModule,
   ],
   controllers: [AppController],
-  providers: [AppService ,TranscodeConsumer],
+  providers: [AppService ,TranscodeConsumer,
+
+    {
+      provide: Logger,
+      useClass: LoggerService,
+    },
+  ],
 })
 export class AppModule {}

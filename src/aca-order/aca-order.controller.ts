@@ -27,9 +27,7 @@ export class AcaOrderController {
     return this.acaOrderService.findAllAcaOrders(options);
   }
   @Get("some")
-  async calculateTotalPaidToday(
-      ) {
-
+  async calculateTotalPaidToday() {
     return this.acaOrderService.calculateTotalPaidToday();
   }
   @Get('calculate-total-paid')

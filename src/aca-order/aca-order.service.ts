@@ -18,7 +18,6 @@ export class AcaOrderService {
     private readonly EducationalCycleService:EducationalCycleService,
     private readonly UsersService:UsersService
   ) {}
-
   async createAcaOrder(orderDto: AcaOrderDto) {
     try {
       const educational_cycle = await this.EducationalCycleService.findOne(orderDto.educational_cycle)
@@ -131,7 +130,6 @@ export class AcaOrderService {
   }
 
   async deleteAcaOrder(id: number): Promise<void> {
-
     try {
       const existingOrder = await this.findAcaOrderById(id);
       existingOrder.active =true
@@ -142,7 +140,6 @@ export class AcaOrderService {
   }
 
   async acceptAcaOrder(id: number): Promise<AcaOrder> {
-
     try {
       const order = await this.findAcaOrderById(id);
 
