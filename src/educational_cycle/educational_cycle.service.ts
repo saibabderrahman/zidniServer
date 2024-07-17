@@ -103,6 +103,9 @@ export class EducationalCycleService {
         }
         return queryBuild;
     }
+
+
+    
     async findOneStudent(id: number): Promise<Educational_cycle[]> {
         const queryBuild = await this.educationRepository.createQueryBuilder('Educational_cycle')
         .leftJoinAndSelect('Educational_cycle.orders', 'orders')
