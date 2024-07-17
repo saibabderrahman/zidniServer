@@ -8,7 +8,7 @@ import { Attendance } from './Attendance';
 export class AcaOrder {
   @PrimaryGeneratedColumn()
   id: number;
-  @Column()
+  @Column({nullable:true})
   firstName:string
   @Column({nullable:true})
   lastName:string
@@ -20,12 +20,14 @@ export class AcaOrder {
   image:string
   @Column({nullable:true})
   price:number
-  @Column()
+  @Column({nullable:true})
   phoneNumber:string
   @Column({nullable:true})
   cart:string
   @Column({nullable:true})
   type:string
+  @Column({nullable:true})
+  chatId: string
   @Column({ default: 'notPaid' })
   status: string;
   @Column({ default: false })

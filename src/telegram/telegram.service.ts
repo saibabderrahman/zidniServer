@@ -81,7 +81,7 @@ async  sendPhoto(chatId: string, photoUrl: string, options?: { caption?: string,
 
     if (!state) {
       if (text === 'إبدأ') {
-        state = this.registrationStateRepository.create({ chatId, step: 'fullName', data: {}, education });
+        state = this.registrationStateRepository.create({ chatId, step: 'fullName', data: {chatId,educational_cycle:{id:education}}, education });
         await this.registrationStateRepository.save(state);
         await this.sendMessage(chatId, 'مرحبًا! نود التعرف عليك أكثر. يُرجى إدخال اسمك الكامل:');
       } else {
