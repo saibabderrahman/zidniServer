@@ -5,8 +5,8 @@ import { Repository } from 'typeorm';
 import { AcaOrderDto } from './dto/AcaOrderDto ';
 import {EducationalCycleService} from "../educational_cycle/educational_cycle.service"
 import { UsersService } from 'src/users/users.service';
-import { Options, queryAndPaginate } from 'src/utility/helpers.utils';
-import { HttpException, HttpStatus } from '@nestjs/common';
+import { handleError, Options, queryAndPaginate } from 'src/utility/helpers.utils';
+import { LoggerService } from 'src/logger.service';
 
 
 
@@ -16,8 +16,10 @@ export class AcaOrderService {
     @InjectRepository(AcaOrder)
     private readonly acaOrderRepository: Repository<AcaOrder>,
     private readonly EducationalCycleService:EducationalCycleService,
-    private readonly UsersService:UsersService
+    private readonly UsersService:UsersService,
+    private readonly logger:LoggerService
   ) {}
+
   async createAcaOrder(orderDto: AcaOrderDto) {
     try {
       const educational_cycle = await this.EducationalCycleService.findOne(orderDto.educational_cycle)
@@ -26,24 +28,13 @@ export class AcaOrderService {
       }
       if (educational_cycle.seatsAvailable === 0) {
         throw new BadRequestException('لا يوجد مقاعد متاحة في هذه الدورة')
-      }
-      const existingOrder = await this.acaOrderRepository
-        .createQueryBuilder('order')
-        .leftJoinAndSelect("order.educational_cycle", "educational_cycle")
-        .where('order.email = :email', { email: orderDto.email })
-        //.andWhere('order.phoneNumber = :phoneNumber', { phoneNumber: orderDto.phoneNumber })
-        .andWhere('educational_cycle.id = :id', { id: orderDto.educational_cycle })
-        .getOne()
-      if (existingOrder) {
-        throw new BadRequestException('هناك طلب مسبق بنفس البريد الإلكتروني ورقم الهاتف والدورة التدريبية.');
-      }
-  
+      }  
       const NewOrder = {
         ...orderDto, price: educational_cycle.price, educational_cycle
       }
       return await this.acaOrderRepository.save(NewOrder);
     } catch (error) {
-      throw error
+      handleError('Error in FindAll wilayats function', error,this.logger,"statesDelivery");    
     }
   }
   

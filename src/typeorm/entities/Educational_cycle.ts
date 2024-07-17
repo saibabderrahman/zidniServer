@@ -22,6 +22,20 @@ export class Educational_cycle {
   show: boolean;
   @Column({ default: true })
   status: boolean;
+  @Column({ nullable:true })
+  contact_phone: string;
+  @Column({ nullable:true })
+  contact_whatsapp: boolean;
+  @Column({ nullable:true })
+  whatsapp_number: string;
+  @Column({ nullable:true ,type:"text" })
+  telegrams_links: string;
+  @Column({ nullable:true ,type:"text" })
+  admin_telegrams_links: string;
+  @Column({ nullable:true ,type:"text" })
+  ccp: string;
+  @Column({default:'تدفع مرة واحدة'})
+  price_payment_terms: string;
   @Column()
   time: string;
   @Column({ nullable: false })

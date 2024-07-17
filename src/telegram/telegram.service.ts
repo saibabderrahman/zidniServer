@@ -193,12 +193,31 @@ async  sendPhoto(chatId: string, photoUrl: string, options?: { caption?: string,
         `;
     
         await this.sendMessage(chatId, summaryMessage);
+        const Education = await this.educationService.findOne(education);
+
     
-        const adminTelegramAccount = "+213668767331";
-        const paymentAmount = 5000;
-        await this.sendMessage(chatId, `لإكمال عملية التسجيل، يُرجى دفع ${paymentAmount} دج إلى حساب الأدمن على تلغرام: ${adminTelegramAccount}`);
+        const adminTelegramAccount = Education.admin_telegrams_links;
+        const paymentAmount = Education.price || 5000;
+        const adminAcount = Education.ccp  || "";
+        const whatsappSupport = Education.whatsapp_number || "";
+        const EducationName = Education.name || ""
+        const StudentName = state.data.fullName
+        
+        const friendlyMessage = `
+        عمل رائع، ${StudentName}!
+        
+        لقد تم تسجيلك في دورة ${EducationName}.
+        
+        لإكمال عملية التسجيل، يُرجى دفع ${paymentAmount} دج إلى الحساب التالي:
+        
+        حساب البريد (CCP): ${adminAcount}
+        
+        بعد إتمام الدفع، يُرجى إرسال وصل التسليم إلى حساب الأدمن على تلغرام: ${adminTelegramAccount} أو عبر الواتساب: ${whatsappSupport}
+        
+        نحن هنا لمساعدتك في أي استفسار أو مساعدة تحتاجها. شكراً لاختياركم لنا!
+        `;
+        await this.sendMessage(chatId, friendlyMessage);
         await this.saveOrder(state.data as Partial<AcaOrder>);
-        await this.registrationStateRepository.remove(state);
         state.step = 'default';
         break;
       default:
@@ -236,13 +255,15 @@ async  sendPhoto(chatId: string, photoUrl: string, options?: { caption?: string,
   }
 
 
-  async handleCommand(command: string, messageObj: any ,education:number): Promise<void> {
+  async handleCommand(command: string, messageObj: any, education: number): Promise<void> {
     const chatId = messageObj.chat.id;
-    const Education = await this.educationService.findOne(education)
+    const Education = await this.educationService.findOne(education);
+  
     switch (command) {
       case 'start':
-        await this.sendMessage(chatId, 'مرحبًا! يمكنك البدء في التسجيل بإدخال "إبدأ".');
+        await this.sendMessage(chatId, `لبدء عملية التسجيل، أدخل "إبدأ".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`);
         break;
+  
       case 'price':
         if (Education.price) {
           await this.sendMessage(chatId, `سعر التسجيل هو ${Education.price} دج لمرة واحدة، ويشمل مدة الدورة ${Education.time}.\n\nلبدء عملية التسجيل، أدخل "إبدأ".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`);
@@ -250,12 +271,27 @@ async  sendPhoto(chatId: string, photoUrl: string, options?: { caption?: string,
           await this.sendMessage(chatId, `عذرًا، لا يوجد معلومات متاحة حاليًا حول السعر.`);
         }
         break;
+  
       case 'admin':
-        await this.sendMessage(chatId, 'يمكنك التواصل مع الأدمن عبر:');
+        const contactPhone = Education.contact_phone || "لا توجد معلومات متاحة حالياً.";
+        const whatsappNumber = Education.whatsapp_number || "لا توجد معلومات متاحة حالياً.";
+        const telegramLinks = Education.telegrams_links || "لا توجد معلومات متاحة حالياً.";
+        
+        const contactMessage = `
+  يمكنك التواصل مع الأدمن عبر الطرق التالية:
+  📞 هاتف: ${contactPhone}
+  📱 واتساب: ${whatsappNumber}
+  📱 تيليجرام: ${telegramLinks}
+  
+  نحن هنا لمساعدتك في أي استفسار أو مساعدة تحتاجها.
+        `;
+        await this.sendMessage(chatId, contactMessage);
         break;
+  
       case 'time':
-        await this.sendMessage(chatId, `مدة الدورة هي ${Education.time} يوميًا.\n\nلبدء عملية التسجيل، أدخل "إبدأ".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`);
+        await this.sendMessage(chatId, `مدة الدورة هي ${Education.time}.\n\nلبدء عملية التسجيل، أدخل "إبدأ".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`);
         break;
+  
       case 'about':
         if (Education && Education.subDescription) {
           await this.sendMessage(chatId, Education.subDescription);
@@ -264,10 +300,12 @@ async  sendPhoto(chatId: string, photoUrl: string, options?: { caption?: string,
           await this.sendMessage(chatId, `عذرًا، لا يوجد معلومات متاحة حاليًا حول الدورة.`);
         }
         break;
+  
       default:
         await this.sendMessage(chatId, `لبدء عملية التسجيل، أدخل "إبدأ".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`);
     }
-      }
+  }
+  
 
   private async saveOrder(orderData: Partial<AcaOrder>): Promise<void> {
     try {
@@ -285,13 +323,9 @@ async  sendPhoto(chatId: string, photoUrl: string, options?: { caption?: string,
       if(!order){
         throw new NotFoundException("order not found")
       }
-
       await this.sendMessage(order.chatId,message)
-      
     } catch (error) {
       handleError('Error in create wilayat function', error,this.logger,"statesDelivery");    
-
-      
     }
   }
 

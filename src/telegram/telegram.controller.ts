@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpCode, Get, Query } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, Get, Query, Param } from '@nestjs/common';
 import { TelegramService } from './telegram.service';
 
 @Controller('telegram')
@@ -32,5 +32,13 @@ export class TelegramController {
         await this.telegramService.handleMessage(body.message ,education);
       }
     }
+  }
+  @Post(':id')
+  async sendMessage(
+    @Param('id') id: number,
+    @Body('message') message: string,
+  ) {
+    await this.telegramService.sendMessageSingleChat(id,message)
+
   }
 }

@@ -24,6 +24,28 @@ export class EducationalCycleDTO {
   @IsNumber()
   @IsOptional()
   id: number;
+
+  @IsString()
+  @IsOptional()
+  telegrams_links: string;
+
+
+  @IsString()
+  @IsOptional()
+  price_payment_terms: string;
+  @IsString()
+  @IsOptional()
+  whatsapp_number: string;
+  @IsString()
+  @IsOptional()
+  contact_phone: string;
+  @IsString()
+  @IsOptional()
+  admin_telegrams_links: string;
+  @IsString()
+  @IsOptional()
+  ccp: string;
+
   @IsOptional()
   @IsString()
   description: string;
