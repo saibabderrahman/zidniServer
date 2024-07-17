@@ -30,20 +30,14 @@ export class TelegramService {
     private readonly AcaOrderService:AcaOrderService,
     private readonly logger:LoggerService,
     private readonly configService:ConfigService
-
-
   ) {}
 
-  private apiToken = "7426367377:AAHB9xMIbmPFQrlVG5Hgtr2rTnTwaP_Ji6Y";
-   private BASE_URL = `https://api.telegram.org/bot${this.apiToken}`;
 
-
- /* async sendMessage(chatId: string, text: string): Promise<void> {
-    await this.axiosInstance.get('sendMessage', {
-      chat_id: chatId,
-      text,
-    })
-  }*/
+  async getFilePath(fileId: string): Promise<string> {
+    const url = `https://api.telegram.org/bot7426367377:AAHB9xMIbmPFQrlVG5Hgtr2rTnTwaP_Ji6Y/getFile?file_id=${fileId}`;
+    const response = await axios.get(url);
+    return response.data.result.file_path;
+  }
 
   async  sendMessage(chatId: string, text: string, apiToken: string): Promise<void> {
     const axiosInstance: AxiosInstance = axios.create({
@@ -57,7 +51,6 @@ export class TelegramService {
           text: text,
         },
       });
-      console.log('Message sent:', response.data);
     } catch (error) {
       console.error('Error sending message:', error);
     }
@@ -72,15 +65,10 @@ export class TelegramService {
     ,apiToken:string
   ) {
     try {
-      const trimmedVideoUrl = videoUrl.trim();
-      const isUrl = trimmedVideoUrl.startsWith('http://') || trimmedVideoUrl.startsWith('https://');
   
-      if (!isUrl) {
-        throw new Error('Invalid URL format');
-      }
       const formData = new FormData();
       formData.append('chat_id', chatId);
-      formData.append('video', fs.createReadStream('./src/telegram/annonce.mp4'));
+      formData.append('video', fs.createReadStream('./src/telegram/description.mp4'));
       const response = await axios.post(`https://api.telegram.org/bot${apiToken}/sendVideo`, formData ,{
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -88,9 +76,32 @@ export class TelegramService {
       });
       } catch (error) {
       console.error('Error sending video:', error.response ? error.response.data : error.message);
-      await this.sendMessage(chatId, 'شكرًا! الآن، يرجى إدخال بلديتك:',apiToken);
+      await this.sendMessage(chatId, 'حدث خطأ أعد المحاولة لاحقا:',apiToken);
     }
   }
+  async sendAudio(chatId: string, audioFilePath: string, options: any = {}, apiToken: string): Promise<void> {
+    try {
+    
+  
+      const formData = new FormData();
+      formData.append('chat_id', chatId);
+      formData.append('audio', fs.createReadStream("./src/telegram/audio.mp3"));
+  
+ 
+  
+      const response = await axios.post(`https://api.telegram.org/bot${apiToken}/sendAudio`, formData, {
+        headers: {
+          ...formData.getHeaders(),
+        },
+      });
+  
+    } catch (error) {
+      console.error('Error sending audio:', error.response ? error.response.data : error.message);
+      await this.sendMessage(chatId, 'Error occurred while sending audio.', apiToken);
+    }
+  }
+  
+  
 
 
 
@@ -291,13 +302,26 @@ export class TelegramService {
   }
 
 
+
   async handleCommand(command: string, messageObj: any, education: number): Promise<void> {
     const chatId = messageObj.chat.id;
     const Education = await this.educationService.findOne(education);
   
     switch (command) {
       case 'start':
-        await this.sendMessage(chatId, 
+        await this.sendAudio(chatId, "./src/telegram/audio.mp3", {
+          caption: `مرحبا بك معنا في ${Education.name}`,
+          supports_streaming: true,
+          show_caption_above_media: true,
+        },Education.token_bot_telegram          );
+        await this.sendMessage(chatId, `مرحبا بك معنا في ${Education.name}`           ,Education.token_bot_telegram        );
+
+
+      await this.sendVideo(chatId, "videoUrl", {
+        caption: '',
+        supports_streaming: true,
+        show_caption_above_media: true,
+      },Education.token_bot_telegram          );        await this.sendMessage(chatId, 
           `لبدء عملية التسجيل، أدخل "إبدأ".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`          ,Education.token_bot_telegram
         );
         break;

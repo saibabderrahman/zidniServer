@@ -8,6 +8,7 @@ export class TelegramController {
   @Post('')
   @HttpCode(200)
   async handleRequest(@Body() body: any,@Query("education") education:number): Promise<void> {
+    
     if (body.message && body.message.text) {
       const text = body.message.text.trim();
 
@@ -22,6 +23,7 @@ export class TelegramController {
   @Get('')
   @HttpCode(200)
   async handleGet(@Body() body: any ,@Query("education") education:number): Promise<void> {
+
     if (body.message && body.message.text) {
       const text = body.message.text.trim();
 

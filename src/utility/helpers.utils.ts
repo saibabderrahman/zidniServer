@@ -60,6 +60,62 @@ export function filterNullEmptyPropertiesInArray(arr: any[]): any[] {
   }
 
 
+  export const  steps = {
+    fullName: {
+      message: 'نود التعرف عليك أكثر. يُرجى إدخال اسمك الكامل:',
+      reminder: 'يبدو أنك نسيت إدخال اسمك الكامل. يُرجى كتابته لاستكمال التسجيل:',
+      nextStep: 'phoneNumber',
+    },
+    phoneNumber: {
+      message: '، يُرجى إدخال رقم هاتفك:',
+      reminder: 'يبدو أنك نسيت إدخال رقم هاتفك، . يُرجى كتابته لاستكمال التسجيل:',
+      nextStep: 'email',
+      process: (text: string) => `+213${text.replace(/^0/, '')}`, // Add +213 and remove leading 0
+    },
+    email: {
+      message: '، يُرجى إدخال بريدك الإلكتروني:',
+      reminder: 'يبدو أنك نسيت إدخال بريدك الإلكتروني، . يُرجى كتابته لاستكمال التسجيل:',
+      nextStep: 'gender',
+    },
+    gender: {
+      message: '، يُرجى إدخال جنسك:',
+      reminder: 'يبدو أنك نسيت إدخال جنسك، . يُرجى كتابته لاستكمال التسجيل:',
+      nextStep: 'Wilaya',
+    },
+    Wilaya: {
+      message: '، يُرجى إدخال الولاية التي تسكن بها:',
+      reminder: 'يبدو أنك نسيت إدخال الولاية التي تسكن بها، . يُرجى كتابتها لاستكمال التسجيل:',
+      nextStep: 'commune',
+    },
+    commune: {
+      message: '، يُرجى إدخال البلدية التي تسكن بها:',
+      reminder: 'يبدو أنك نسيت إدخال البلدية التي تسكن بها، . يُرجى كتابتها لاستكمال التسجيل:',
+      nextStep: 'educationLevel',
+    },
+    educationLevel: {
+      message: '، يُرجى إدخال مستوى تعليمك (إبتدائي، متوسط، جامعي ...):',
+      reminder: 'يبدو أنك نسيت إدخال مستوى تعليمك، . يُرجى كتابته لاستكمال التسجيل:',
+      nextStep: 'memorizationValue',
+    },
+    memorizationValue: {
+      message: '، يُرجى إدخال مقدار حفظك للقرآن الكريم:',
+      reminder: 'يبدو أنك نسيت إدخال مقدار حفظك للقرآن الكريم، . يُرجى كتابته لاستكمال التسجيل:',
+      nextStep: 'cart',
+    },
+    cart: {
+      message: '، يُرجى إدخال الرواية التي تقرأ بها (مثلاً: حفص عن عاصم، ورش عن نافع، وغيرها من الروايات العشر):',
+      reminder: 'يبدو أنك نسيت إدخال الرواية التي تقرأ بها، . يُرجى كتابتها لاستكمال التسجيل:',
+      nextStep: 'dateOfBirth',
+    },
+    dateOfBirth: {
+      message: '، يُرجى إدخال تاريخ ميلادك:',
+      reminder: 'يبدو أنك نسيت إدخال تاريخ ميلادك، . يُرجى كتابته لاستكمال التسجيل:',
+      nextStep: 'complete',
+    },
+  };
+  
+
+
  export async function queryAndPaginate(queryBuilder, offset, limit) {
    const totalCount = await queryBuilder.getCount();
    const hasMore = totalCount > offset + limit;
