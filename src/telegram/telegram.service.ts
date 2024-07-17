@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AcaOrder, RegistrationState } from 'src/typeorm/entities';
 import { Repository } from 'typeorm';
@@ -11,6 +11,9 @@ import * as fs from 'fs'; // For file handling if needed
 
 import axios from 'axios';
 import { EducationalCycleService } from 'src/educational_cycle/educational_cycle.service';
+import { AcaOrderService } from 'src/aca-order/aca-order.service';
+import { LoggerService } from 'src/logger.service';
+import { handleError } from 'src/utility/helpers.utils';
 
 
 
@@ -22,7 +25,10 @@ export class TelegramService {
   constructor(
     @InjectRepository(AcaOrder) private readonly orderRepository: Repository<AcaOrder>,
     @InjectRepository(RegistrationState) private readonly registrationStateRepository: Repository<RegistrationState>,
-    private readonly educationService:EducationalCycleService
+    private readonly educationService:EducationalCycleService,
+    private readonly AcaOrderService:AcaOrderService,
+    private readonly logger:LoggerService
+
   ) {}
 
   private apiToken = "7426367377:AAHB9xMIbmPFQrlVG5Hgtr2rTnTwaP_Ji6Y";
@@ -270,6 +276,22 @@ async  sendPhoto(chatId: string, photoUrl: string, options?: { caption?: string,
     } catch (error) {
       console.error('Failed to save order:', error);
       throw new Error('Could not save order. Please try again later.');
+    }
+  }
+  async sendMessageSingleChat(id:number,message:string){
+    try {
+      const order = await this.AcaOrderService.findAcaOrderById(id)
+
+      if(!order){
+        throw new NotFoundException("order not found")
+      }
+
+      await this.sendMessage(order.chatId,message)
+      
+    } catch (error) {
+      handleError('Error in create wilayat function', error,this.logger,"statesDelivery");    
+
+      
     }
   }
 

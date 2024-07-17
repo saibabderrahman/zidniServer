@@ -10,6 +10,7 @@ import { LoggerService } from 'src/logger.service';
 @Module({
   imports:[TypeOrmModule.forFeature([AcaOrder]),EducationalCycleModule,UsersModule],
   providers: [AcaOrderService,LoggerService],
-  controllers: [AcaOrderController]
+  controllers: [AcaOrderController],
+  exports:[AcaOrderService]
 })
 export class AcaOrderModule {}
