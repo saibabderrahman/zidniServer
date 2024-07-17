@@ -52,7 +52,7 @@ export class AcaOrderService {
 
       return totalPaidToday.totalPaid || 0;
     } catch (error) {
-      throw new BadRequestException(error);
+      handleError('Error in calculateTotalPaidToday function', error,this.logger,"statesDelivery");    
     }
   }
   async calculateTotalPaidBetweenDates(startDate: Date, endDate: Date): Promise<number> {

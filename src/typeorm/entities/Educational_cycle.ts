@@ -34,6 +34,8 @@ export class Educational_cycle {
   admin_telegrams_links: string;
   @Column({ nullable:true ,type:"text" })
   ccp: string;
+  @Column({ nullable:true ,type:"text" })
+  token_bot_telegram: string;
   @Column({default:'تدفع مرة واحدة'})
   price_payment_terms: string;
   @Column()

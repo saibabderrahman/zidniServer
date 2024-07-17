@@ -3,13 +3,20 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Educational_cycle } from 'src/typeorm/entities/Educational_cycle';
 import { Repository } from 'typeorm';
 import { EducationalCycleDTO } from './dto/EducationalCycleDTO';
-import { Options, queryAndPaginate } from 'src/utility/helpers.utils';
+import { handleError, Options, queryAndPaginate } from 'src/utility/helpers.utils';
 import { TypeEducationService } from 'src/type_education/type_education.service';
+import axios from 'axios';
+import { ConfigService } from '@nestjs/config';
+import { LoggerService } from 'src/logger.service';
 
 @Injectable()
 export class EducationalCycleService {
     constructor(@InjectRepository(Educational_cycle) private readonly educationRepository: Repository<Educational_cycle>,
     private readonly TypeEducation:TypeEducationService,
+    private readonly configService:ConfigService,
+    private readonly logger:LoggerService,
+
+
 
     ) {}
 
@@ -17,13 +24,21 @@ export class EducationalCycleService {
     try {
         const type_Education =   await this.TypeEducation.findOne(data.type_Education)
         const educational_cycle = await this.educationRepository.create({...data,type_Education});
-        return await this.educationRepository.save(educational_cycle);
-    } catch (error) {
-        if (error.message) {
-            throw new BadRequestException(error.message);
-        } else {
-            throw new BadRequestException(error);
+         const  newEducation =await this.educationRepository.save(educational_cycle);
+        
+        if(educational_cycle.token_bot_telegram){
+            try {
+                  const response = await  axios.get(`${this.configService.get("TELEGRAM_URL")}/bot${educational_cycle.token_bot_telegram}
+                  /setwebhook?url=${this.configService.get("BACKEND")}/telegram?education=${newEducation.id}`)
+            } catch (error) {
+                throw new Error("Telegram TokenNotCorrect")
+            }
+            
         }
+        return
+    } catch (error) {
+        handleError('Error in Create function', error,this.logger,"EducationalCycleServicey");    
+
     }
     }
     async save(data: Educational_cycle): Promise<Educational_cycle> {
@@ -122,9 +137,27 @@ export class EducationalCycleService {
     }
 
     async update(id: number, data: Educational_cycle): Promise<Educational_cycle> {
-        const existingEducationalCycle = await this.findOne(id);
-        const updatedEducationalCycle = Object.assign(existingEducationalCycle, data);
-        return await this.educationRepository.save(updatedEducationalCycle);
+        try {
+            
+            const existingEducationalCycle = await this.findOne(id);
+            const updatedEducationalCycle = Object.assign(existingEducationalCycle, data);
+              const updated = await this.educationRepository.save(updatedEducationalCycle);
+
+
+              if(updated.token_bot_telegram){
+                try {
+                   const response = await axios.get(`${this.configService.get("TELEGRAM_URL")}/bot${updated .token_bot_telegram}/setwebhook?url=${this.configService.get("BACKEND")}/telegram?education=${updated.id}`)
+                } catch (error) {
+                    throw new Error("Telegram TokenNotCorrect")
+                }
+                
+            }
+            return updated
+        } catch (error) {
+            handleError('Error in update function', error,this.logger,"EducationalCycleServicey");    
+
+            
+        }
     }
 
     async remove(id: number): Promise<void> {

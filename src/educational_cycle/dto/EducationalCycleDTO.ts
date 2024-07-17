@@ -30,6 +30,7 @@ export class EducationalCycleDTO {
   telegrams_links: string;
 
 
+  
   @IsString()
   @IsOptional()
   price_payment_terms: string;
@@ -42,6 +43,9 @@ export class EducationalCycleDTO {
   @IsString()
   @IsOptional()
   admin_telegrams_links: string;
+  @IsString()
+  @IsOptional()
+  token_bot_telegram: string;
   @IsString()
   @IsOptional()
   ccp: string;

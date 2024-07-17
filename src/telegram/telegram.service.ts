@@ -9,11 +9,12 @@ import { StepDto, PhoneNumberStepDto, EmailStepDto, GenderStepDto, DateOfBirthSt
 import * as FormData from 'form-data'; // Use form-data package
 import * as fs from 'fs'; // For file handling if needed
 
-import axios from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import { EducationalCycleService } from 'src/educational_cycle/educational_cycle.service';
 import { AcaOrderService } from 'src/aca-order/aca-order.service';
 import { LoggerService } from 'src/logger.service';
 import { handleError } from 'src/utility/helpers.utils';
+import { ConfigService } from '@nestjs/config';
 
 
 
@@ -27,7 +28,9 @@ export class TelegramService {
     @InjectRepository(RegistrationState) private readonly registrationStateRepository: Repository<RegistrationState>,
     private readonly educationService:EducationalCycleService,
     private readonly AcaOrderService:AcaOrderService,
-    private readonly logger:LoggerService
+    private readonly logger:LoggerService,
+    private readonly configService:ConfigService
+
 
   ) {}
 
@@ -35,16 +38,38 @@ export class TelegramService {
    private BASE_URL = `https://api.telegram.org/bot${this.apiToken}`;
 
 
-  async sendMessage(chatId: string, text: string): Promise<void> {
+ /* async sendMessage(chatId: string, text: string): Promise<void> {
     await this.axiosInstance.get('sendMessage', {
       chat_id: chatId,
       text,
     })
+  }*/
+
+  async  sendMessage(chatId: string, text: string, apiToken: string): Promise<void> {
+    const axiosInstance: AxiosInstance = axios.create({
+      baseURL: `https://api.telegram.org/bot${apiToken}/`,
+    });
+  
+    try {
+      const response = await axiosInstance.get('sendMessage', {
+        params: {
+          chat_id: chatId,
+          text: text,
+        },
+      });
+      console.log('Message sent:', response.data);
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
   }
+  
+
+
   async sendVideo(
     chatId, 
     videoUrl, 
     options = {}
+    ,apiToken:string
   ) {
     try {
       const trimmedVideoUrl = videoUrl.trim();
@@ -56,42 +81,40 @@ export class TelegramService {
       const formData = new FormData();
       formData.append('chat_id', chatId);
       formData.append('video', fs.createReadStream('./src/telegram/annonce.mp4'));
-      const response = await axios.post(`${this.BASE_URL}/sendVideo`, formData ,{
+      const response = await axios.post(`https://api.telegram.org/bot${apiToken}/sendVideo`, formData ,{
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
       } catch (error) {
       console.error('Error sending video:', error.response ? error.response.data : error.message);
-      await this.sendMessage(chatId, 'شكرًا! الآن، يرجى إدخال بلديتك:');
+      await this.sendMessage(chatId, 'شكرًا! الآن، يرجى إدخال بلديتك:',apiToken);
     }
   }
 
 
 
 
-async  sendPhoto(chatId: string, photoUrl: string, options?: { caption?: string, message_effect_id?: string, show_caption_above_media?: boolean }): Promise<void> {
-    await axiosInstance.post('sendPhoto', {
-        chat_id: chatId,
-        photo: photoUrl,
-        caption: options?.caption,
-        message_effect_id: options?.message_effect_id,
-        show_caption_above_media: options?.show_caption_above_media,
-    });
-}
+
 
   async handleMessage(messageObj: any ,education:number): Promise<void> {
     const chatId = messageObj.chat.id;
     let state = await this.registrationStateRepository.findOne({ where: { chatId ,education } });
     const text = messageObj.text.trim();
+    const Education = await this.educationService.findOne(education);
+
 
     if (!state) {
       if (text === 'إبدأ') {
         state = this.registrationStateRepository.create({ chatId, step: 'fullName', data: {chatId,educational_cycle:{id:education}}, education });
         await this.registrationStateRepository.save(state);
-        await this.sendMessage(chatId, 'مرحبًا! نود التعرف عليك أكثر. يُرجى إدخال اسمك الكامل:');
+        await this.sendMessage(chatId, 'مرحبًا! نود التعرف عليك أكثر. يُرجى إدخال اسمك الكامل:',Education.token_bot_telegram);
       } else {
-        await this.sendMessage(chatId, `لبدء عملية التسجيل، أدخل "إبدأ".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`);
+        await this.sendMessage(
+          chatId, `لبدء عملية التسجيل، أدخل "إبدأ".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`
+          ,Education.token_bot_telegram
+        
+        );
       }
       return;
     }
@@ -104,7 +127,8 @@ async  sendPhoto(chatId: string, photoUrl: string, options?: { caption?: string,
         state.data.firstName = text.split(' ')[0]; // Assuming first name is the first word
         state.data.lastName = text.split(' ').slice(1).join(' '); // The rest is last name
         state.data.fullName = text;
-        await this.sendMessage(chatId, `ممتاز، ${state.data.firstName}! الآن، يُرجى إدخال رقم هاتفك:`);
+        await this.sendMessage(chatId, `ممتاز، ${state.data.firstName}! الآن، يُرجى إدخال رقم هاتفك:` , Education.token_bot_telegram
+        );
         state.step = 'phoneNumber';
         break;
       case 'phoneNumber':
@@ -112,10 +136,12 @@ async  sendPhoto(chatId: string, photoUrl: string, options?: { caption?: string,
         const phoneErrors = await validate(phoneStepDto);
         if (phoneErrors.length > 0) {
           const errorMessage = phoneErrors.map(err => Object.values(err.constraints)).join(', ');
-          await this.sendMessage(chatId, `عذرًا، ${state.data.firstName}، هناك خطأ في البيانات: ${errorMessage}`);
+          await this.sendMessage(chatId, `عذرًا، ${state.data.firstName}، هناك خطأ في البيانات: ${errorMessage}`          ,Education.token_bot_telegram
+          );
           break;
         }
-        await this.sendMessage(chatId, `حسنًا، ${state.data.firstName}! الآن، يُرجى إدخال بريدك الإلكتروني:`);
+        await this.sendMessage(chatId, `حسنًا، ${state.data.firstName}! الآن، يُرجى إدخال بريدك الإلكتروني:`          ,Education.token_bot_telegram
+        );
         state.step = 'email';
         break;
       case 'email':
@@ -124,10 +150,12 @@ async  sendPhoto(chatId: string, photoUrl: string, options?: { caption?: string,
         const emailErrors = await validate(emailStepDto);
         if (emailErrors.length > 0) {
           const errorMessage = emailErrors.map(err => Object.values(err.constraints)).join(', ');
-          await this.sendMessage(chatId, `عذرًا، ${state.data.firstName}، هناك خطأ في البيانات: ${errorMessage}`);
+          await this.sendMessage(chatId, `عذرًا، ${state.data.firstName}، هناك خطأ في البيانات: ${errorMessage}`          ,Education.token_bot_telegram
+          );
           break;
         }
-        await this.sendMessage(chatId, `رائع، ${state.data.firstName}! الآن، يُرجى إدخال جنسك:`);
+        await this.sendMessage(chatId, `رائع، ${state.data.firstName}! الآن، يُرجى إدخال جنسك:`          ,Education.token_bot_telegram
+        );
         state.step = 'gender';
         break;
       case 'gender':
@@ -136,35 +164,42 @@ async  sendPhoto(chatId: string, photoUrl: string, options?: { caption?: string,
         const genderErrors = await validate(genderStepDto);
         if (genderErrors.length > 0) {
           const errorMessage = genderErrors.map(err => Object.values(err.constraints)).join(', ');
-          await this.sendMessage(chatId, `عذرًا، ${state.data.firstName}، هناك خطأ في البيانات: ${errorMessage}`);
+          await this.sendMessage(chatId, `عذرًا، ${state.data.firstName}، هناك خطأ في البيانات: ${errorMessage}`          ,Education.token_bot_telegram
+          );
           break;
         }
-        await this.sendMessage(chatId, `جيد، ${state.data.firstName}! الآن، يُرجى إدخال الولاية التي تسكن بها:`);
+        await this.sendMessage(chatId, `جيد، ${state.data.firstName}! الآن، يُرجى إدخال الولاية التي تسكن بها:`          ,Education.token_bot_telegram
+        );
         state.step = 'Wilaya';
         break;
       case 'Wilaya':
         state.data.wilaya = text;
-        await this.sendMessage(chatId, `ممتاز، ${state.data.firstName}! الآن، يُرجى إدخال البلدية التي تسكن بها:`);
+        await this.sendMessage(chatId, `ممتاز، ${state.data.firstName}! الآن، يُرجى إدخال البلدية التي تسكن بها:`          ,Education.token_bot_telegram
+        );
         state.step = 'commune';
         break;
       case 'commune':
         state.data.commune = text;
-        await this.sendMessage(chatId, `رائع، ${state.data.firstName}! الآن، يُرجى إدخال مستوى تعليمك (إبتدائي، متوسط، جامعي ...):`);
+        await this.sendMessage(chatId, `رائع، ${state.data.firstName}! الآن، يُرجى إدخال مستوى تعليمك (إبتدائي، متوسط، جامعي ...):`          ,Education.token_bot_telegram
+        );
         state.step = 'educationLevel';
         break;
       case 'educationLevel':
         state.data.educationLevel = text;
-        await this.sendMessage(chatId, `حسنًا، ${state.data.firstName}! الآن، يُرجى إدخال مقدار حفظك للقرآن الكريم:`);
+        await this.sendMessage(chatId, `حسنًا، ${state.data.firstName}! الآن، يُرجى إدخال مقدار حفظك للقرآن الكريم:`          ,Education.token_bot_telegram
+        );
         state.step = 'memorizationValue';
         break;
       case 'memorizationValue':
         state.data.memorizationValue = text;
-        await this.sendMessage(chatId, `ممتاز، ${state.data.firstName}! الآن، يُرجى إدخال الرواية التي تقرأ بها (مثلاً: حفص عن عاصم، ورش عن نافع، وغيرها من الروايات العشر):`);
+        await this.sendMessage(chatId, `ممتاز، ${state.data.firstName}! الآن، يُرجى إدخال الرواية التي تقرأ بها (مثلاً: حفص عن عاصم، ورش عن نافع، وغيرها من الروايات العشر):`           ,Education.token_bot_telegram
+        );
         state.step = 'cart';
         break;
       case 'cart':
         state.data.cart = text;
-        await this.sendMessage(chatId, `حسنًا، ${state.data.firstName}! الآن، يُرجى إدخال تاريخ ميلادك:`);
+        await this.sendMessage(chatId, `حسنًا، ${state.data.firstName}! الآن، يُرجى إدخال تاريخ ميلادك:`          ,Education.token_bot_telegram
+        );
         state.step = 'dateOfBirth';
         break;
       case 'dateOfBirth':
@@ -173,10 +208,12 @@ async  sendPhoto(chatId: string, photoUrl: string, options?: { caption?: string,
         const dobErrors = await validate(dobStepDto);
         if (dobErrors.length > 0) {
           const errorMessage = dobErrors.map(err => Object.values(err.constraints)).join(', ');
-          await this.sendMessage(chatId, `عذرًا، ${state.data.firstName}، هناك خطأ في البيانات: ${errorMessage}`);
+          await this.sendMessage(chatId, `عذرًا، ${state.data.firstName}، هناك خطأ في البيانات: ${errorMessage}`          ,Education.token_bot_telegram
+          );
           break;
         }
-        await this.sendMessage(chatId, `تم التسجيل بنجاح، ${state.data.firstName}! نشكرك على تعاونك.`);
+        await this.sendMessage(chatId, `تم التسجيل بنجاح، ${state.data.firstName}! نشكرك على تعاونك.`          ,Education.token_bot_telegram
+        );
     
         const summaryMessage = `
         المعلومات التي أدخلتها:
@@ -192,8 +229,7 @@ async  sendPhoto(chatId: string, photoUrl: string, options?: { caption?: string,
         - تاريخ الميلاد: ${state.data.dateOfBirth}
         `;
     
-        await this.sendMessage(chatId, summaryMessage);
-        const Education = await this.educationService.findOne(education);
+        await this.sendMessage(chatId, summaryMessage ,Education.token_bot_telegram        );
 
     
         const adminTelegramAccount = Education.admin_telegrams_links;
@@ -216,7 +252,7 @@ async  sendPhoto(chatId: string, photoUrl: string, options?: { caption?: string,
         
         نحن هنا لمساعدتك في أي استفسار أو مساعدة تحتاجها. شكراً لاختياركم لنا!
         `;
-        await this.sendMessage(chatId, friendlyMessage);
+        await this.sendMessage(chatId, friendlyMessage ,Education.token_bot_telegram        );
         await this.saveOrder(state.data as Partial<AcaOrder>);
         state.step = 'default';
         break;
@@ -237,17 +273,17 @@ async  sendPhoto(chatId: string, photoUrl: string, options?: { caption?: string,
               caption: 'تفاصيل الدورة ...',
               supports_streaming: true,
               show_caption_above_media: true,
-            });
+            },Education.token_bot_telegram          );
             responseMessage = "تم إرسال تفاصيل الدورة عبر الفيديو.";
             break;
           case 'مواعيد الدراسة':
             responseMessage = 'مواعيد الدراسة ...';
             break;
           default:
-            responseMessage = `لبدء عملية التسجيل، أدخل "إبدأ".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`
+            responseMessage = `تم تسجيلك بنجاح ".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`
             break;
         }
-        await this.sendMessage(chatId, responseMessage);
+        await this.sendMessage(chatId, responseMessage           ,Education.token_bot_telegram        );
         break;
     }
 
@@ -261,14 +297,18 @@ async  sendPhoto(chatId: string, photoUrl: string, options?: { caption?: string,
   
     switch (command) {
       case 'start':
-        await this.sendMessage(chatId, `لبدء عملية التسجيل، أدخل "إبدأ".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`);
+        await this.sendMessage(chatId, 
+          `لبدء عملية التسجيل، أدخل "إبدأ".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`          ,Education.token_bot_telegram
+        );
         break;
   
       case 'price':
         if (Education.price) {
-          await this.sendMessage(chatId, `سعر التسجيل هو ${Education.price} دج لمرة واحدة، ويشمل مدة الدورة ${Education.time}.\n\nلبدء عملية التسجيل، أدخل "إبدأ".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`);
+          await this.sendMessage(chatId, `سعر التسجيل هو ${Education.price} دج لمرة واحدة، ويشمل مدة الدورة ${Education.time}.\n\nلبدء عملية التسجيل، أدخل "إبدأ".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`           ,Education.token_bot_telegram
+          );
         } else {
-          await this.sendMessage(chatId, `عذرًا، لا يوجد معلومات متاحة حاليًا حول السعر.`);
+          await this.sendMessage(chatId, `عذرًا، لا يوجد معلومات متاحة حاليًا حول السعر.`           ,Education.token_bot_telegram
+          );
         }
         break;
   
@@ -285,30 +325,37 @@ async  sendPhoto(chatId: string, photoUrl: string, options?: { caption?: string,
   
   نحن هنا لمساعدتك في أي استفسار أو مساعدة تحتاجها.
         `;
-        await this.sendMessage(chatId, contactMessage);
+        await this.sendMessage(chatId, contactMessage           ,Education.token_bot_telegram
+        );
         break;
   
       case 'time':
-        await this.sendMessage(chatId, `مدة الدورة هي ${Education.time}.\n\nلبدء عملية التسجيل، أدخل "إبدأ".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`);
+        await this.sendMessage(chatId, `مدة الدورة هي ${Education.time}.\n\nلبدء عملية التسجيل، أدخل "إبدأ".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`           ,Education.token_bot_telegram
+        );
         break;
   
       case 'about':
         if (Education && Education.subDescription) {
-          await this.sendMessage(chatId, Education.subDescription);
-          await this.sendMessage(chatId, `لبدء عملية التسجيل، أدخل "إبدأ".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`);
+          await this.sendMessage(chatId, Education.subDescription          ,Education.token_bot_telegram
+          );
+          await this.sendMessage(chatId, `لبدء عملية التسجيل، أدخل "إبدأ".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`          ,Education.token_bot_telegram
+          );
         } else {
-          await this.sendMessage(chatId, `عذرًا، لا يوجد معلومات متاحة حاليًا حول الدورة.`);
+          await this.sendMessage(chatId, `عذرًا، لا يوجد معلومات متاحة حاليًا حول الدورة.`          ,Education.token_bot_telegram
+          );
         }
         const videoUrl = 'https://utfs.io/f/5c24e2ab-5f1c-47b7-920f-7fc268b435fc-e3elni.mp4';
         await this.sendVideo(chatId, videoUrl, {
           caption: 'تفاصيل الدورة ...',
           supports_streaming: true,
           show_caption_above_media: true,
-        });
+        }           ,Education.token_bot_telegram
+      );
         break;
   
       default:
-        await this.sendMessage(chatId, `لبدء عملية التسجيل، أدخل "إبدأ".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`);
+        await this.sendMessage(chatId, `لبدء عملية التسجيل، أدخل "إبدأ".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`           ,Education.token_bot_telegram
+        );
     }
   }
   
@@ -329,7 +376,8 @@ async  sendPhoto(chatId: string, photoUrl: string, options?: { caption?: string,
       if(!order){
         throw new NotFoundException("order not found")
       }
-      await this.sendMessage(order.chatId,message)
+      await this.sendMessage(order.chatId,message,order.educational_cycle.token_bot_telegram
+      )
     } catch (error) {
       handleError('Error in create wilayat function', error,this.logger,"statesDelivery");    
     }
