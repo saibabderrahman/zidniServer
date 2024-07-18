@@ -149,7 +149,7 @@ export class TelegramService {
     const photo = messageObj?.photo;
 
     if (!state) {
-      if (text === 'إبدأ') {
+      if (text === 'حسنا') {
         state = this.registrationStateRepository.create({ chatId, step: 'fullName',apiToken:Education.token_bot_telegram , data: {chatId,educational_cycle:{id:education}}, education });
         await this.registrationStateRepository.save(state);
         await this.sendMessage(chatId, 'مرحبًا! نود التعرف عليك أكثر. يُرجى إدخال اسمك الكامل:',Education.token_bot_telegram);
