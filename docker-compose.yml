@@ -32,6 +32,8 @@ services:
   ## - "6379:6379"
 volumes:
   mysql_data:
+  upload_data:
+
 
 
   
