@@ -15,6 +15,8 @@ import { AcaOrderService } from 'src/aca-order/aca-order.service';
 import { LoggerService } from 'src/logger.service';
 import { handleError } from 'src/utility/helpers.utils';
 import { ConfigService } from '@nestjs/config';
+import { createWriteStream } from 'fs';
+
 
 
 
@@ -33,11 +35,40 @@ export class TelegramService {
   ) {}
 
 
-  async getFilePath(fileId: string): Promise<string> {
-    const url = `https://api.telegram.org/bot7426367377:AAHB9xMIbmPFQrlVG5Hgtr2rTnTwaP_Ji6Y/getFile?file_id=${fileId}`;
-    const response = await axios.get(url);
-    return response.data.result.file_path;
+  async downloadImage(fileId: string ,education): Promise<string> {
+    
+    const Education = await this.educationService.findOne(education)
+    const token = Education.token_bot_telegram;
+    const getFileUrl = `https://api.telegram.org/bot${token}/getFile?file_id=${fileId}`;
+
+    try {
+      const fileResponse = await axios.get(getFileUrl);
+      const filePath = fileResponse.data.result.file_path;
+      const fileUrl = `https://api.telegram.org/file/bot${token}/${filePath}`;
+      const localFilePath = `./src/upload/${fileId}.jpg`;
+
+      const writer = createWriteStream(localFilePath);
+      const response = await axios({
+        url: fileUrl,
+        method: 'GET',
+        responseType: 'stream',
+      });
+
+      response.data.pipe(writer);
+      
+
+      return new Promise((resolve, reject) => {
+        writer.on('finish', () => resolve(`${fileId}.jpg`));
+        writer.on('error', reject);
+      });;
+    } catch (error) {
+      console.error('Error downloading image:', error);
+    }
   }
+
+
+
+
 
   async  sendMessage(chatId: string, text: string, apiToken: string): Promise<void> {
     const axiosInstance: AxiosInstance = axios.create({
@@ -108,12 +139,12 @@ export class TelegramService {
 
 
 
-  async handleMessage(messageObj: any ,education:number): Promise<void> {
+  async handleMessage(messageObj: any ,education:number ,image?:boolean): Promise<void> {
     const chatId = messageObj.chat.id;
     let state = await this.registrationStateRepository.findOne({ where: { chatId ,education } });
-    const text = messageObj.text.trim();
+    const text = messageObj.text?.trim();
     const Education = await this.educationService.findOne(education);
-
+    const photo = messageObj.photo;
 
     if (!state) {
       if (text === 'إبدأ') {
@@ -129,10 +160,15 @@ export class TelegramService {
       }
       return;
     }
+
+    
+    if (!text && state.step !== "image") {
+      await this.sendMessage(chatId, 'النص المدخل فارغ، يُرجى المحاولة مرة أخرى.', Education.token_bot_telegram);
+      return;
+  }
     if (state.step === 'phoneNumber') {
       state.data.phoneNumber = `+213${text.replace(/^0/, '')}`; // Add +213 and remove leading 0
     }
-
     switch (state.step) {
       case 'fullName':
         state.data.firstName = text.split(' ')[0]; // Assuming first name is the first word
@@ -239,10 +275,7 @@ export class TelegramService {
         - الرواية: ${state.data.cart}
         - تاريخ الميلاد: ${state.data.dateOfBirth}
         `;
-    
         await this.sendMessage(chatId, summaryMessage ,Education.token_bot_telegram        );
-
-    
         const adminTelegramAccount = Education.admin_telegrams_links;
         const paymentAmount = Education.price || 5000;
         const adminAcount = Education.ccp  || "";
@@ -250,7 +283,7 @@ export class TelegramService {
         const EducationName = Education.name || ""
         const StudentName = state.data.fullName
         
-        const friendlyMessage = `
+       /* const friendlyMessage = `
         عمل رائع، ${StudentName}!
         
         لقد تم تسجيلك في دورة ${EducationName}.
@@ -262,11 +295,40 @@ export class TelegramService {
         بعد إتمام الدفع، يُرجى إرسال وصل التسليم إلى حساب الأدمن على تلغرام: ${adminTelegramAccount} أو عبر الواتساب: ${whatsappSupport}
         
         نحن هنا لمساعدتك في أي استفسار أو مساعدة تحتاجها. شكراً لاختياركم لنا!
-        `;
+        `;*/
+        const friendlyMessage = `
+عمل رائع، ${StudentName}!
+
+لقد تم تسجيلك في دورة ${EducationName}.
+
+لإكمال عملية التسجيل، يُرجى دفع ${paymentAmount} دج إلى الحساب التالي:
+
+حساب البريد (CCP): ${adminAcount}
+
+بعد إتمام الدفع، يُرجى إرسال صورة لإيصال الدفع هنا.
+
+إذا كانت لديك أي استفسارات أو تحتاج إلى مساعدة، يُرجى التواصل مع الأدمن على تلغرام: ${adminTelegramAccount} أو عبر الواتساب: ${whatsappSupport}
+
+نحن هنا لمساعدتك في أي استفسار أو مساعدة تحتاجها. شكراً لاختياركم لنا!
+`;
         await this.sendMessage(chatId, friendlyMessage ,Education.token_bot_telegram        );
-        await this.saveOrder(state.data as Partial<AcaOrder>);
-        state.step = 'default';
+       const order =  await this.saveOrder(state.data as Partial<AcaOrder>);
+
+        state.step = 'image';
+        state.data.id= order.id
         break;
+        case 'image':
+          if (photo) {
+            const fileId = photo[photo.length - 1].file_id;
+            const downloadedImage = await this.downloadImage(fileId, education);
+            state.data.image = downloadedImage;
+            await this.sendMessage(chatId, `شكرًا لك، ${state.data.firstName}!\nتم استلام صورة إيصال الدفع.\nسيتم مراجعة طلبك وسيتم إشعارك بالخطوات التالية قريبًا.`, Education.token_bot_telegram);
+            await this.saveOrder(state.data as Partial<AcaOrder>);
+            state.step = 'default';
+          } else {
+            await this.sendMessage(chatId, 'لم يتم استلام أي صورة. يُرجى إرسال صورة لإيصال الدفع.', Education.token_bot_telegram);
+          }
+          break;
       default:
         const message = text.trim().toLowerCase();
         let responseMessage = '';
@@ -384,10 +446,10 @@ export class TelegramService {
   }
   
 
-  private async saveOrder(orderData: Partial<AcaOrder>): Promise<void> {
+  private async saveOrder(orderData: Partial<AcaOrder>) {
     try {
       const order = this.orderRepository.create(orderData);
-      await this.orderRepository.save(order);
+       return await this.orderRepository.save(order);
     } catch (error) {
       console.error('Failed to save order:', error);
       throw new Error('Could not save order. Please try again later.');

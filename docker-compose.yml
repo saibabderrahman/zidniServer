@@ -12,7 +12,7 @@ services:
   restart: always
   build: .
   volumes:
-   - upload_data:/app/upload
+   - upload_data:/app/src/upload
   env_file:
    - ./.env
  database:
