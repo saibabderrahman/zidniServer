@@ -13,9 +13,11 @@ import axios, { AxiosInstance } from 'axios';
 import { EducationalCycleService } from 'src/educational_cycle/educational_cycle.service';
 import { AcaOrderService } from 'src/aca-order/aca-order.service';
 import { LoggerService } from 'src/logger.service';
-import { handleError } from 'src/utility/helpers.utils';
+import { handleError, steps } from 'src/utility/helpers.utils';
 import { ConfigService } from '@nestjs/config';
 import { createWriteStream } from 'fs';
+import { Cron } from '@nestjs/schedule';
+
 
 
 
@@ -144,16 +146,16 @@ export class TelegramService {
     let state = await this.registrationStateRepository.findOne({ where: { chatId ,education } });
     const text = messageObj.text?.trim();
     const Education = await this.educationService.findOne(education);
-    const photo = messageObj.photo;
+    const photo = messageObj?.photo;
 
     if (!state) {
       if (text === 'إبدأ') {
-        state = this.registrationStateRepository.create({ chatId, step: 'fullName', data: {chatId,educational_cycle:{id:education}}, education });
+        state = this.registrationStateRepository.create({ chatId, step: 'fullName',apiToken:Education.token_bot_telegram , data: {chatId,educational_cycle:{id:education}}, education });
         await this.registrationStateRepository.save(state);
         await this.sendMessage(chatId, 'مرحبًا! نود التعرف عليك أكثر. يُرجى إدخال اسمك الكامل:',Education.token_bot_telegram);
       } else {
         await this.sendMessage(
-          chatId, `لبدء عملية التسجيل، أدخل "إبدأ".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`
+          chatId, `لبدء عملية التسجيل، أدخل "حسنا".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`
           ,Education.token_bot_telegram
         
         );
@@ -230,15 +232,16 @@ export class TelegramService {
         const summaryMessage = `
         المعلومات التي أدخلتها:
         - الاسم الكامل: ${state.data.fullName}
+        - تاريخ الميلاد: ${state.data.age} 
         - رقم الهاتف: ${state.data.phoneNumber}
-        - البريد الإلكتروني: ${state.data.email}
         - الجنس: ${state.data.gender}
         - الولاية: ${state.data.wilaya}
         - البلدية: ${state.data.commune}
         - المستوى التعليمي: ${state.data.educationLevel}
         - قيمة الحفظ: ${state.data.memorizationValue}
         - الرواية: ${state.data.cart}
-        - تاريخ الميلاد: ${state.data.dateOfBirth}  `;
+         `
+        ;
         await this.sendMessage(chatId, summaryMessage ,Education.token_bot_telegram);
         const adminTelegramAccount = Education.admin_telegrams_links;
         const paymentAmount = Education.price || 5000;
@@ -333,13 +336,13 @@ export class TelegramService {
         supports_streaming: true,
         show_caption_above_media: true,
       },Education.token_bot_telegram          );        await this.sendMessage(chatId, 
-          `لبدء عملية التسجيل، أدخل "إبدأ".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`          ,Education.token_bot_telegram
+          `لبدء عملية التسجيل، أدخل "حسنا".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`          ,Education.token_bot_telegram
         );
         break;
   
       case 'price':
         if (Education.price) {
-          await this.sendMessage(chatId, `سعر التسجيل هو ${Education.price} دج لمرة واحدة، ويشمل مدة الدورة ${Education.time}.\n\nلبدء عملية التسجيل، أدخل "إبدأ".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`           ,Education.token_bot_telegram
+          await this.sendMessage(chatId, `سعر التسجيل هو ${Education.price} دج لمرة واحدة، ويشمل مدة الدورة ${Education.time}.\n\nلبدء عملية التسجيل، أدخل "حسنا".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`           ,Education.token_bot_telegram
           );
         } else {
           await this.sendMessage(chatId, `عذرًا، لا يوجد معلومات متاحة حاليًا حول السعر.`           ,Education.token_bot_telegram
@@ -365,7 +368,7 @@ export class TelegramService {
         break;
   
       case 'time':
-        await this.sendMessage(chatId, `مدة الدورة هي ${Education.time}.\n\nلبدء عملية التسجيل، أدخل "إبدأ".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`           ,Education.token_bot_telegram
+        await this.sendMessage(chatId, `مدة الدورة هي ${Education.time}.\n\nلبدء عملية التسجيل، أدخل "حسنا".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`           ,Education.token_bot_telegram
         );
         break;
   
@@ -373,7 +376,7 @@ export class TelegramService {
         if (Education && Education.subDescription) {
           await this.sendMessage(chatId, Education.subDescription          ,Education.token_bot_telegram
           );
-          await this.sendMessage(chatId, `لبدء عملية التسجيل، أدخل "إبدأ".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`          ,Education.token_bot_telegram
+          await this.sendMessage(chatId, `لبدء عملية التسجيل، أدخل "حسنا".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`          ,Education.token_bot_telegram
           );
         } else {
           await this.sendMessage(chatId, `عذرًا، لا يوجد معلومات متاحة حاليًا حول الدورة.`          ,Education.token_bot_telegram
@@ -389,7 +392,7 @@ export class TelegramService {
         break;
   
       default:
-        await this.sendMessage(chatId, `لبدء عملية التسجيل، أدخل "إبدأ".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`           ,Education.token_bot_telegram
+        await this.sendMessage(chatId, `لبدء عملية التسجيل، أدخل "حسنا".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`           ,Education.token_bot_telegram
         );
     }
   }
@@ -404,6 +407,8 @@ export class TelegramService {
       throw new Error('Could not save order. Please try again later.');
     }
   }
+
+
   async sendMessageSingleChat(id:number,message:string){
     try {
       const order = await this.AcaOrderService.findAcaOrderById(id)
@@ -418,6 +423,23 @@ export class TelegramService {
     }
   }
 
+  @Cron('* * 6 * * *')
+  async SendMessagesREminder(){
+    try {
+      const state = await this.registrationStateRepository.createQueryBuilder("registrationState")
+      .where("registrationState.step != :step", { step: "default" })
+      .getMany();
+      console.log(state)
+      for ( const step of state){
+        await this.sendMessage(step.chatId.toString(),steps[step.step].reminder,step.apiToken)
+      }
+
+    } catch (error) {
+
+
+    }
+
+  }
 
 
 }

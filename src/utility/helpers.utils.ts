@@ -107,7 +107,7 @@ export function filterNullEmptyPropertiesInArray(arr: any[]): any[] {
       reminder: 'يبدو أنك نسيت إدخال الرواية التي تقرأ بها، . يُرجى كتابتها لاستكمال التسجيل:',
       nextStep: 'dateOfBirth',
     },
-    dateOfBirth: {
+    age: {
       message: '، يُرجى إدخال تاريخ ميلادك:',
       reminder: 'يبدو أنك نسيت إدخال تاريخ ميلادك، . يُرجى كتابته لاستكمال التسجيل:',
       nextStep: 'complete',

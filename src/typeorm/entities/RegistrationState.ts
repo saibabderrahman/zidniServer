@@ -12,6 +12,10 @@ export class RegistrationState {
 
   @Column({nullable:true})
   step: string;
+  @Column({nullable:true})
+
+
+  apiToken:string
 
   @Column({ type: 'json' })
   data: Record<string, any>;

@@ -52,6 +52,7 @@ import { Logger } from 'winston';
 import { LoggerService } from './logger.service';
 import { TelegramModule } from './telegram/telegram.module';
 import { RegistrationStateModule } from './registration-state/registration-state.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 
 
@@ -63,6 +64,8 @@ import { RegistrationStateModule } from './registration-state/registration-state
         port: 6379,
       },
     }),
+    ScheduleModule.forRoot(),
+
     BullModule.registerQueue({
       name:TRANSCODE_QUEUE,
     }),
