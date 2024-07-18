@@ -14,6 +14,8 @@ export class AcaOrder {
   lastName:string
   @Column({nullable:true})
   email:string
+  @Column({nullable:true})
+  age:string
   @OneToMany(()=>Attendance , att => att.order)
   Attendance:Attendance[]
   @Column({nullable:true})

@@ -5,9 +5,9 @@ import { Repository } from 'typeorm';
 import { axiosInstance } from './configuration';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
-import { StepDto, PhoneNumberStepDto, EmailStepDto, GenderStepDto, DateOfBirthStepDto } from './dto/step.dto';
-import * as FormData from 'form-data'; // Use form-data package
-import * as fs from 'fs'; // For file handling if needed
+import { PhoneNumberStepDto,} from './dto/step.dto';
+import * as FormData from 'form-data';
+import * as fs from 'fs'; 
 
 import axios, { AxiosInstance } from 'axios';
 import { EducationalCycleService } from 'src/educational_cycle/educational_cycle.service';
@@ -120,7 +120,7 @@ export class TelegramService {
   
  
   
-      const response = await axios.post(`https://api.telegram.org/bot${apiToken}/sendAudio`, formData, {
+      await axios.post(`https://api.telegram.org/bot${apiToken}/sendAudio`, formData, {
         headers: {
           ...formData.getHeaders(),
         },
@@ -174,10 +174,14 @@ export class TelegramService {
         state.data.firstName = text.split(' ')[0]; // Assuming first name is the first word
         state.data.lastName = text.split(' ').slice(1).join(' '); // The rest is last name
         state.data.fullName = text;
-        await this.sendMessage(chatId, `ممتاز، ${state.data.firstName}! الآن، يُرجى إدخال رقم هاتفك:` , Education.token_bot_telegram
-        );
-        state.step = 'phoneNumber';
+        await this.sendMessage(chatId, `مرحبًا، ${state.data.firstName}! يُرجى إخباري بتاريخ ميلادك إذا سمحت 🎂`, Education.token_bot_telegram);
+        state.step = 'age';
         break;
+       case 'age':
+         state.data.age = text;
+         await this.sendMessage(chatId, `ممتاز، ${state.data.firstName}! الآن، يُرجى إدخال رقم هاتفك:` , Education.token_bot_telegram );
+         state.step = 'phoneNumber';
+         break;
       case 'phoneNumber':
         const phoneStepDto = plainToClass(PhoneNumberStepDto, state.data);
         const phoneErrors = await validate(phoneStepDto);
@@ -187,34 +191,11 @@ export class TelegramService {
           );
           break;
         }
-        await this.sendMessage(chatId, `حسنًا، ${state.data.firstName}! الآن، يُرجى إدخال بريدك الإلكتروني:`          ,Education.token_bot_telegram
-        );
-        state.step = 'email';
-        break;
-      case 'email':
-        state.data.email = text;
-        const emailStepDto = plainToClass(EmailStepDto, state.data);
-        const emailErrors = await validate(emailStepDto);
-        if (emailErrors.length > 0) {
-          const errorMessage = emailErrors.map(err => Object.values(err.constraints)).join(', ');
-          await this.sendMessage(chatId, `عذرًا، ${state.data.firstName}، هناك خطأ في البيانات: ${errorMessage}`          ,Education.token_bot_telegram
-          );
-          break;
-        }
-        await this.sendMessage(chatId, `رائع، ${state.data.firstName}! الآن، يُرجى إدخال جنسك:`          ,Education.token_bot_telegram
-        );
+        await this.sendMessage(chatId, `ممتاز، ${state.data.firstName}! حاليًا، هل يمكنك أن تخبرني بجنسك؟ مثلاً: ذكر أو أنثى`, Education.token_bot_telegram);
         state.step = 'gender';
         break;
       case 'gender':
         state.data.gender = text;
-        const genderStepDto = plainToClass(GenderStepDto, state.data);
-        const genderErrors = await validate(genderStepDto);
-        if (genderErrors.length > 0) {
-          const errorMessage = genderErrors.map(err => Object.values(err.constraints)).join(', ');
-          await this.sendMessage(chatId, `عذرًا، ${state.data.firstName}، هناك خطأ في البيانات: ${errorMessage}`          ,Education.token_bot_telegram
-          );
-          break;
-        }
         await this.sendMessage(chatId, `جيد، ${state.data.firstName}! الآن، يُرجى إدخال الولاية التي تسكن بها:`          ,Education.token_bot_telegram
         );
         state.step = 'Wilaya';
@@ -245,23 +226,7 @@ export class TelegramService {
         break;
       case 'cart':
         state.data.cart = text;
-        await this.sendMessage(chatId, `حسنًا، ${state.data.firstName}! الآن، يُرجى إدخال تاريخ ميلادك:`          ,Education.token_bot_telegram
-        );
-        state.step = 'dateOfBirth';
-        break;
-      case 'dateOfBirth':
-        state.data.dateOfBirth = text;
-        const dobStepDto = plainToClass(DateOfBirthStepDto, state.data);
-        const dobErrors = await validate(dobStepDto);
-        if (dobErrors.length > 0) {
-          const errorMessage = dobErrors.map(err => Object.values(err.constraints)).join(', ');
-          await this.sendMessage(chatId, `عذرًا، ${state.data.firstName}، هناك خطأ في البيانات: ${errorMessage}`          ,Education.token_bot_telegram
-          );
-          break;
-        }
-        await this.sendMessage(chatId, `تم التسجيل بنجاح، ${state.data.firstName}! نشكرك على تعاونك.`          ,Education.token_bot_telegram
-        );
-    
+        await this.sendMessage(chatId, `تم التسجيل بنجاح، ${state.data.firstName}! نشكرك على تعاونك.`,Education.token_bot_telegram  );
         const summaryMessage = `
         المعلومات التي أدخلتها:
         - الاسم الكامل: ${state.data.fullName}
@@ -273,29 +238,14 @@ export class TelegramService {
         - المستوى التعليمي: ${state.data.educationLevel}
         - قيمة الحفظ: ${state.data.memorizationValue}
         - الرواية: ${state.data.cart}
-        - تاريخ الميلاد: ${state.data.dateOfBirth}
-        `;
-        await this.sendMessage(chatId, summaryMessage ,Education.token_bot_telegram        );
+        - تاريخ الميلاد: ${state.data.dateOfBirth}  `;
+        await this.sendMessage(chatId, summaryMessage ,Education.token_bot_telegram);
         const adminTelegramAccount = Education.admin_telegrams_links;
         const paymentAmount = Education.price || 5000;
         const adminAcount = Education.ccp  || "";
         const whatsappSupport = Education.whatsapp_number || "";
         const EducationName = Education.name || ""
         const StudentName = state.data.fullName
-        
-       /* const friendlyMessage = `
-        عمل رائع، ${StudentName}!
-        
-        لقد تم تسجيلك في دورة ${EducationName}.
-        
-        لإكمال عملية التسجيل، يُرجى دفع ${paymentAmount} دج إلى الحساب التالي:
-        
-        حساب البريد (CCP): ${adminAcount}
-        
-        بعد إتمام الدفع، يُرجى إرسال وصل التسليم إلى حساب الأدمن على تلغرام: ${adminTelegramAccount} أو عبر الواتساب: ${whatsappSupport}
-        
-        نحن هنا لمساعدتك في أي استفسار أو مساعدة تحتاجها. شكراً لاختياركم لنا!
-        `;*/
         const friendlyMessage = `
 عمل رائع، ${StudentName}!
 
@@ -312,8 +262,7 @@ export class TelegramService {
 نحن هنا لمساعدتك في أي استفسار أو مساعدة تحتاجها. شكراً لاختياركم لنا!
 `;
         await this.sendMessage(chatId, friendlyMessage ,Education.token_bot_telegram        );
-       const order =  await this.saveOrder(state.data as Partial<AcaOrder>);
-
+        const order =  await this.saveOrder(state.data as Partial<AcaOrder>);
         state.step = 'image';
         state.data.id= order.id
         break;
