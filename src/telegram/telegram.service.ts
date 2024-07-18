@@ -382,13 +382,13 @@ export class TelegramService {
           await this.sendMessage(chatId, `عذرًا، لا يوجد معلومات متاحة حاليًا حول الدورة.`          ,Education.token_bot_telegram
           );
         }
-        const videoUrl = 'https://utfs.io/f/5c24e2ab-5f1c-47b7-920f-7fc268b435fc-e3elni.mp4';
-        await this.sendVideo(chatId, videoUrl, {
-          caption: 'تفاصيل الدورة ...',
-          supports_streaming: true,
-          show_caption_above_media: true,
-        }           ,Education.token_bot_telegram
-      );
+   //    const videoUrl = 'https://utfs.io/f/5c24e2ab-5f1c-47b7-920f-7fc268b435fc-e3elni.mp4';
+   //    await this.sendVideo(chatId, videoUrl, {
+   //      caption: 'تفاصيل الدورة ...',
+   //      supports_streaming: true,
+   //      show_caption_above_media: true,
+   //    }           ,Education.token_bot_telegram
+   //  );
         break;
   
       default:

@@ -112,6 +112,11 @@ export function filterNullEmptyPropertiesInArray(arr: any[]): any[] {
       reminder: 'يبدو أنك نسيت إدخال تاريخ ميلادك، . يُرجى كتابته لاستكمال التسجيل:',
       nextStep: 'complete',
     },
+     image: {
+      message: 'تذكير بأرسال وصل الدفع لأإكمال عملية التسجيل:',
+      reminder: 'يبدو أنك نسيت إرسال وصل الدفع. يُرجى إرساله لاستكمال التسجيل:',
+      nextStep: 'complete',
+    },
   };
   
 
