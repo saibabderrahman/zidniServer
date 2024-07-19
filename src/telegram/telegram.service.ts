@@ -262,7 +262,7 @@ export class TelegramService {
       case 'admin':
         const contactPhone = Education.contact_phone || "لا توجد معلومات متاحة حالياً.";
         const whatsappNumber = Education.whatsapp_number || "لا توجد معلومات متاحة حالياً.";
-        const telegramLinks = Education.telegrams_links || "لا توجد معلومات متاحة حالياً.";
+        const telegramLinks = Education.admin_telegrams_links || "لا توجد معلومات متاحة حالياً.";
         
         const contactMessage = `
   يمكنك التواصل مع الأدمن عبر الطرق التالية:
