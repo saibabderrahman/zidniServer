@@ -184,7 +184,7 @@ export class AcaOrderService {
 
 
       if(!order.chatId) throw new BadRequestException("هذا الطلب لا يحتوى على bot telegram")
-      await this.RegistrationService.findByCHatID(Number(order.chatId),order.educational_cycle.id)
+    const state =  await this.RegistrationService.findByCHatID(Number(order.chatId),order.educational_cycle.id)
 
       const message = `عزيزي ${order.firstName || order.lastName},
 
@@ -197,12 +197,11 @@ export class AcaOrderService {
 مع تحيات،
 فريق الدعم
 `
+      await this.RegistrationService.save({...state,step:"image"})
+        
       await sendMessage(order.chatId,message,order.educational_cycle.token_bot_telegram)
 
       
-      order.status = "paid";
-
-      await this.acaOrderRepository.save(order)
 
 
     } catch (error) {

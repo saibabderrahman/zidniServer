@@ -36,18 +36,20 @@ export class RegistrationStateService {
   }
 
   async findByCHatID(chatId:number,education:number):Promise<RegistrationState>{
-
     try {
-      
       let state = await this.registrationStateRepository.findOne({ where: { chatId ,education } });
-  
-  
       if(!state) throw new NotFoundException("not found")
-  
-        return state
+      return state
     } catch (error) {
-      
+      throw new NotFoundException("not found")
     }
-
+  }
+  async save(state:RegistrationState):Promise<void>{
+    try {
+       await this.registrationStateRepository.save(state)
+      return 
+    } catch (error) {
+      throw new NotFoundException("not found")
+    }
   }
 }
