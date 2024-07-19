@@ -7,6 +7,7 @@ import { RegistrationState } from 'src/typeorm/entities';
 @Module({
   imports:[TypeOrmModule.forFeature([RegistrationState])],
   controllers: [RegistrationStateController],
-  providers: [RegistrationStateService]
+  providers: [RegistrationStateService],
+  exports:[RegistrationStateService]
 })
 export class RegistrationStateModule {}

@@ -43,9 +43,14 @@ export class AcaOrderController {
   }
 
   @Put(':id')
-  async Accept(@Param('id') id: number): Promise<AcaOrder> {
-    return this.acaOrderService.acceptAcaOrder(id);
+  async Accept(@Param('id') id: number): Promise<void> {
+    return this.acaOrderService.acceptAcaOrderFromTelegram(id);
   }
+  @Put('refuse/:id')
+  async Refuse(@Param('id') id: number): Promise<void> {
+    return this.acaOrderService.RefuseAcaOrderFromTelegram(id);
+  }
+
 
   @Delete(':id')
   async deleteAcaOrder(@Param('id') id: number): Promise<void> {

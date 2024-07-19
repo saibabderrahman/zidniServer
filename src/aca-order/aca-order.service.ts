@@ -5,8 +5,10 @@ import { Repository } from 'typeorm';
 import { AcaOrderDto } from './dto/AcaOrderDto ';
 import {EducationalCycleService} from "../educational_cycle/educational_cycle.service"
 import { UsersService } from 'src/users/users.service';
-import { handleError, Options, queryAndPaginate } from 'src/utility/helpers.utils';
+import { handleError, Options, queryAndPaginate, sendMessage } from 'src/utility/helpers.utils';
 import { LoggerService } from 'src/logger.service';
+import { RegistrationState } from 'src/typeorm/entities';
+import { RegistrationStateService } from 'src/registration-state/registration-state.service';
 
 
 
@@ -16,6 +18,7 @@ export class AcaOrderService {
     @InjectRepository(AcaOrder)
     private readonly acaOrderRepository: Repository<AcaOrder>,
     private readonly EducationalCycleService:EducationalCycleService,
+    private readonly RegistrationService:RegistrationStateService,
     private readonly UsersService:UsersService,
     private readonly logger:LoggerService
   ) {}
@@ -96,7 +99,7 @@ export class AcaOrderService {
       }; 
       
     } catch (error) {
-      throw new BadRequestException(error) 
+      handleError('Error in FindAll wilayats function', error,this.logger,"statesDelivery");    
 
       
     }
@@ -135,9 +138,7 @@ export class AcaOrderService {
       const order = await this.findAcaOrderById(id);
 
       if (order.status === 'notPaid') {
-        
        if(order.educational_cycle){
-
          const   user =  await this.UsersService.createFromOrder(order,order.educational_cycle)
          order.status = 'paid';
          order.educational_cycle.seatsAvailable -=1
@@ -152,6 +153,60 @@ export class AcaOrderService {
       }
     } catch (error) {
       throw new BadRequestException(error) 
+
+      
+    }
+  }
+
+  async acceptAcaOrderFromTelegram(id: number): Promise<void> {
+    try {
+      const order = await this.findAcaOrderById(id);
+
+
+      if(!order.chatId) throw new BadRequestException("هذا الطلب لا يحتوى على bot telegram")
+      await sendMessage(order.chatId,order.educational_cycle.telegrams_links,order.educational_cycle.token_bot_telegram)
+
+
+      order.status = "paid";
+
+      await this.acaOrderRepository.save(order)
+
+
+    } catch (error) {
+      handleError('Error in acceptAcaOrderFromTelegram function', error,this.logger,"acadOrderService");    
+
+      
+    }
+  }
+  async RefuseAcaOrderFromTelegram(id: number): Promise<void> {
+    try {
+      const order = await this.findAcaOrderById(id);
+
+
+      if(!order.chatId) throw new BadRequestException("هذا الطلب لا يحتوى على bot telegram")
+      await this.RegistrationService.findByCHatID(Number(order.chatId),order.educational_cycle.id)
+
+      const message = `عزيزي ${order.firstName || order.lastName},
+
+لقد تلقينا صورة لإيصال الدفع ولكنها غير صحيحة. يُرجى التأكد من وضوح جميع التفاصيل في الإيصال وإعادة إرسال الصورة مرة أخرى  هنا او إإلى حساب الأدمن: ${order.educational_cycle.contact_phone}.
+
+إذا كانت لديك أي استفسارات أو تحتاج إلى مساعدة، يُرجى التواصل مع الأدمن على تلغرام: ${order.educational_cycle.admin_telegrams_links} أو عبر الواتساب: ${order.educational_cycle.whatsapp_number}.
+
+نحن هنا لمساعدتك في أي استفسار أو مساعدة تحتاجها. شكراً لاختياركم لنا!
+
+مع تحيات،
+فريق الدعم
+`
+      await sendMessage(order.chatId,message,order.educational_cycle.token_bot_telegram)
+
+      
+      order.status = "paid";
+
+      await this.acaOrderRepository.save(order)
+
+
+    } catch (error) {
+      handleError('Error in acceptAcaOrderFromTelegram function', error,this.logger,"acadOrderService");    
 
       
     }
