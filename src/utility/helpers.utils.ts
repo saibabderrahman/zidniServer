@@ -22,8 +22,28 @@ import {
   GatewayTimeoutException,
   PreconditionFailedException,
 } from '@nestjs/common';
+import axios, { AxiosInstance } from 'axios';
 import { LoggerService } from 'src/logger.service';
+import * as FormData from 'form-data';
+import * as fs from 'fs'; 
 
+
+
+export const messages = {
+  "startRegistration": "لبدء عملية التسجيل، أدخل \"حسنا\".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة",
+  "emptyTextError": "النص المدخل فارغ، يُرجى المحاولة مرة أخرى.",
+  "phoneNumberStepMessage": "ممتاز، {firstName}! حاليًا، هل يمكنك أن تخبرني بجنسك؟ مثلاً: ذكر أو أنثى",
+  "genderStepMessage": "جيد، {firstName}! الآن، يُرجى إدخال الولاية التي تسكن بها:",
+  "wilayaStepMessage": "ممتاز، {firstName}! الآن، يُرجى إدخال البلدية التي تسكن بها:",
+  "communeStepMessage": "رائع، {firstName}! الآن، يُرجى إدخال مستوى تعليمك (إبتدائي، متوسط، جامعي ...):",
+  "educationLevelStepMessage": "حسنًا، {firstName}! الآن، يُرجى إدخال مقدار حفظك للقرآن الكريم:",
+  "memorizationValueStepMessage": "ممتاز، {firstName}! الآن، يُرجى إدخال الرواية التي تقرأ بها (مثلاً: حفص عن عاصم، ورش عن نافع، وغيرها من الروايات العشر):",
+  "registrationSuccess": "تم التسجيل بنجاح، {firstName}! نشكرك على تعاونك.",
+  "friendlyMessage": "عمل رائع، {studentName}!\n\nلقد تم تسجيلك في دورة {educationName}.\n\nلإكمال عملية التسجيل، يُرجى دفع {paymentAmount} دج إلى الحساب التالي:\n\nحساب البريد (CCP): {adminAccount}\n\nبعد إتمام الدفع، يُرجى إرسال صورة لإيصال الدفع هنا.\n\nإذا كانت لديك أي استفسارات أو تحتاج إلى مساعدة، يُرجى التواصل مع الأدمن على تلغرام: {adminTelegramAccount} أو عبر الواتساب: {whatsappSupport}\n\nنحن هنا لمساعدتك في أي استفسار أو مساعدة تحتاجها. شكراً لاختياركم لنا!",
+  "imageReceived": "شكرًا لك، {firstName}!\nتم استلام صورة إيصال الدفع.\nسيتم مراجعة طلبك وسيتم إشعارك بالخطوات التالية قريبًا.",
+  "noImageError": "لم يتم استلام أي صورة. يُرجى إرسال صورة لإيصال الدفع.",
+  "defaultResponse": "تم تسجيلك بنجاح \"حسنا\".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة"
+}
 export function filterNullEmptyPropertiesInArray(arr: any[]): any[] {
     return arr.map((obj) => filterNullEmptyProperties(obj));
   }
@@ -118,6 +138,43 @@ export function filterNullEmptyPropertiesInArray(arr: any[]): any[] {
       nextStep: 'complete',
     },
   };
+
+  export async function sendMessage(chatId: string, text: string, apiToken: string): Promise<void> {
+    const axiosInstance: AxiosInstance = axios.create({
+      baseURL: `https://api.telegram.org/bot${apiToken}/`,
+    });
+
+    try {
+      await axiosInstance.get('sendMessage', {
+        params: {
+          chat_id: chatId,
+          text: text,
+        },
+      });
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
+  }
+ export async function sendMedia(
+    chatId: string,
+    filePath: string,
+    mediaType: 'video' | 'audio',
+    apiToken: string
+  ): Promise<void> {
+    try {
+      const formData = new FormData();
+      formData.append('chat_id', chatId);
+      formData.append(mediaType, fs.createReadStream(filePath));
+
+      await axios.post(`https://api.telegram.org/bot${apiToken}/send${mediaType.charAt(0).toUpperCase() + mediaType.slice(1)}`, formData, {
+        headers: { ...formData.getHeaders() },
+      });
+    } catch (error) {
+      console.error(`Error sending ${mediaType}:`, error.response ? error.response.data : error.message);
+      await this.sendMessage(chatId, 'Error occurred while sending media.', apiToken);
+    }
+  }
+
   
 
 
