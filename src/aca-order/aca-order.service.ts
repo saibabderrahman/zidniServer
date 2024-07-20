@@ -136,7 +136,6 @@ export class AcaOrderService {
   async acceptAcaOrder(id: number): Promise<AcaOrder> {
     try {
       const order = await this.findAcaOrderById(id);
-
       if (order.status === 'notPaid') {
        if(order.educational_cycle){
          const   user =  await this.UsersService.createFromOrder(order,order.educational_cycle)

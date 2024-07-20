@@ -140,6 +140,7 @@ export function filterNullEmptyPropertiesInArray(arr: any[]): any[] {
   };
 
   export async function sendMessage(chatId: string, text: string, apiToken: string): Promise<void> {
+    
     const axiosInstance: AxiosInstance = axios.create({
       baseURL: `https://api.telegram.org/bot${apiToken}/`,
     });
@@ -151,6 +152,7 @@ export function filterNullEmptyPropertiesInArray(arr: any[]): any[] {
           text: text,
         },
       });
+
     } catch (error) {
       console.error('Error sending message:', error);
     }

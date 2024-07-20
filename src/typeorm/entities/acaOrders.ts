@@ -28,8 +28,8 @@ export class AcaOrder {
   cart:string
   @Column({nullable:true})
   type:string
-  @Column({nullable:true})
-  chatId: string
+  @Column({ type: 'bigint', nullable: true })
+  chatId: string;
   @Column({ default: 'notPaid' })
   status: string;
   @Column({ default: false })
