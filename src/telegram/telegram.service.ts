@@ -363,14 +363,13 @@ export class TelegramService {
     }
   }
 
-  @Cron('4 * * * * *')
+  @Cron('0 */3 * * *')
   async SendMessagesREminder(){
     try {
       
       const state = await this.registrationStateRepository.createQueryBuilder("registrationState")
       .where("registrationState.step != :step", { step: "default" })
       .getMany();
-      console.log({state})
       for ( const step of state){
         await sendMessage(step.chatId.toString(),steps[step.step].reminder,step.apiToken)
       }
