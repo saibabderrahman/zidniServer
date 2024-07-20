@@ -261,6 +261,8 @@ export class TelegramService {
         await sendMedia(chatId, "./src/telegram/audio.mp3","audio",Education.token_bot_telegram);
         await sendMessage(chatId, `مرحبا بك معنا في ${Education.name}`,Education.token_bot_telegram);
         await sendMedia(chatId, "./src/telegram/description.mp4","video",Education.token_bot_telegram);
+        await sendMessage(chatId, `لبدء عملية التسجيل، أدخل "حسنا".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about تفاصيل برنامج ${Education.name} \n- /time لمعرفة مدة الدراسة\n- /howTolearn لمعرفة كيفية الدراسة\n- /special لمعرفة الحالات الخاصة`, Education.token_bot_telegram);
+
         break;
       case 'price':
         if (Education.price) {
@@ -269,7 +271,7 @@ export class TelegramService {
           await sendMessage(chatId, `عذرًا، لا يوجد معلومات متاحة حاليًا حول السعر.`           ,Education.token_bot_telegram
           );
         }
-        await sendMessage(chatId, `لبدء عملية التسجيل، أدخل "حسنا".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة\n- /howTolearn لمعرفة كيفية الدراسة\n- /special لمعرفة الحالات الخاصة`, Education.token_bot_telegram);
+        await sendMessage(chatId, `لبدء عملية التسجيل، أدخل "حسنا".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about تفاصيل برنامج ${Education.name} \n- /time لمعرفة مدة الدراسة\n- /howTolearn لمعرفة كيفية الدراسة\n- /special لمعرفة الحالات الخاصة`, Education.token_bot_telegram);
 
         break;
   
@@ -287,14 +289,14 @@ export class TelegramService {
   نحن هنا لمساعدتك في أي استفسار أو مساعدة تحتاجها.
         `;
         await sendMessage(chatId, contactMessage           ,Education.token_bot_telegram );
-        await sendMessage(chatId, `لبدء عملية التسجيل، أدخل "حسنا".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة\n- /howTolearn لمعرفة كيفية الدراسة\n- /special لمعرفة الحالات الخاصة`, Education.token_bot_telegram);
+        await sendMessage(chatId, `لبدء عملية التسجيل، أدخل "حسنا".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about تفاصيل برنامج ${Education.name} \n- /time لمعرفة مدة الدراسة\n- /howTolearn لمعرفة كيفية الدراسة\n- /special لمعرفة الحالات الخاصة`, Education.token_bot_telegram);
 
         break;
   
       case 'time':
         await sendMessage(chatId, `مدة الدورة هي ${Education.time}`,Education.token_bot_telegram );
         await sendMessage(chatId, `${timeDetails || ""}`,Education.token_bot_telegram );
-        await sendMessage(chatId, `لبدء عملية التسجيل، أدخل "حسنا".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة\n- /howTolearn لمعرفة كيفية الدراسة\n- /special لمعرفة الحالات الخاصة`, Education.token_bot_telegram);
+        await sendMessage(chatId, `لبدء عملية التسجيل، أدخل "حسنا".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about تفاصيل برنامج ${Education.name} \n- /time لمعرفة مدة الدراسة\n- /howTolearn لمعرفة كيفية الدراسة\n- /special لمعرفة الحالات الخاصة`, Education.token_bot_telegram);
 
         break;
   
@@ -308,7 +310,7 @@ export class TelegramService {
           );
           
         }
-        await sendMessage(chatId, `لبدء عملية التسجيل، أدخل "حسنا".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة\n- /howTolearn لمعرفة كيفية الدراسة\n- /special لمعرفة الحالات الخاصة`, Education.token_bot_telegram);
+        await sendMessage(chatId, `لبدء عملية التسجيل، أدخل "حسنا".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about تفاصيل برنامج ${Education.name} \n- /time لمعرفة مدة الدراسة\n- /howTolearn لمعرفة كيفية الدراسة\n- /special لمعرفة الحالات الخاصة`, Education.token_bot_telegram);
 
         break;
         case 'howTolearn':
@@ -317,7 +319,7 @@ export class TelegramService {
           } else {
             await sendMessage(chatId, `عذرًا، لا توجد معلومات متاحة حاليًا حول كيفية الدراسة.`, Education.token_bot_telegram);
           }
-          await sendMessage(chatId, `لبدء عملية التسجيل، أدخل "حسنا".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة\n- /howTolearn لمعرفة كيفية الدراسة\n- /special لمعرفة الحالات الخاصة`, Education.token_bot_telegram);
+          await sendMessage(chatId, `لبدء عملية التسجيل، أدخل "حسنا".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about تفاصيل برنامج ${Education.name} \n- /time لمعرفة مدة الدراسة\n- /howTolearn لمعرفة كيفية الدراسة\n- /special لمعرفة الحالات الخاصة`, Education.token_bot_telegram);
 
           break;
         case 'special':
@@ -326,12 +328,12 @@ export class TelegramService {
           } else {
             await sendMessage(chatId, `عذرًا، لا توجد معلومات متاحة حاليًا حول الحالات الخاصة.`, Education.token_bot_telegram);
           }
-          await sendMessage(chatId, `لبدء عملية التسجيل، أدخل "حسنا".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة\n- /howTolearn لمعرفة كيفية الدراسة\n- /special لمعرفة الحالات الخاصة`, Education.token_bot_telegram);
+          await sendMessage(chatId, `لبدء عملية التسجيل، أدخل "حسنا".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about تفاصيل برنامج ${Education.name} \n- /time لمعرفة مدة الدراسة\n- /howTolearn لمعرفة كيفية الدراسة\n- /special لمعرفة الحالات الخاصة`, Education.token_bot_telegram);
 
           break;
   
       default:
-        await sendMessage(chatId, `لبدء عملية التسجيل، أدخل "حسنا".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة\n- /howTolearn لمعرفة كيفية الدراسة\n- /special لمعرفة الحالات الخاصة`, Education.token_bot_telegram);
+        await sendMessage(chatId, `لبدء عملية التسجيل، أدخل "حسنا".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about تفاصيل برنامج ${Education.name} \n- /time لمعرفة مدة الدراسة\n- /howTolearn لمعرفة كيفية الدراسة\n- /special لمعرفة الحالات الخاصة`, Education.token_bot_telegram);
     }
   }
   
@@ -361,7 +363,7 @@ export class TelegramService {
     }
   }
 
-  @Cron('* 1 * * * *')
+  @Cron('4 * * * * *')
   async SendMessagesREminder(){
     try {
       
@@ -372,12 +374,8 @@ export class TelegramService {
       for ( const step of state){
         await sendMessage(step.chatId.toString(),steps[step.step].reminder,step.apiToken)
       }
-
     } catch (error) {
-
-
     }
-
   }
 
 
