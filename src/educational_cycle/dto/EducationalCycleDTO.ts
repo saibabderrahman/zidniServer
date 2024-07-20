@@ -49,7 +49,25 @@ export class EducationalCycleDTO {
   @IsString()
   @IsOptional()
   ccp: string;
+  @IsString()
+  @IsOptional()
+  timeDetails: string;
+  @IsString()
+  @IsOptional()
+  howToLean: string;
+  @IsString()
+  @IsOptional()
+  special: string;
+  @IsString()
+  @IsOptional()
+  addonCourse: string;
 
+  @IsString()
+  @IsOptional()
+  about_video: string;
+  @IsString()
+  @IsOptional()
+  about_audio: string;
   @IsOptional()
   @IsString()
   description: string;
@@ -57,6 +75,10 @@ export class EducationalCycleDTO {
   @IsString({ each: true })
   @IsOptional()
   images: string[];
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  reviews: string[];
   @IsArray()
   @IsString({ each: true })
   @IsOptional()

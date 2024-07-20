@@ -50,9 +50,12 @@ export class AcaOrderController {
   async Refuse(@Param('id') id: number): Promise<void> {
     return this.acaOrderService.RefuseAcaOrderFromTelegram(id);
   }
+  @Put('addon/:id')
+  async addon(@Param('id') id: number): Promise<void> {
+    return this.acaOrderService.SendAddonCourse(id);
+  }
 
-
-  @Delete(':id')
+  @Delete(':id')  
   async deleteAcaOrder(@Param('id') id: number): Promise<void> {
     return this.acaOrderService.deleteAcaOrder(id);
   }

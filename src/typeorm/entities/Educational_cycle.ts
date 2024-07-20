@@ -12,6 +12,9 @@ export class Educational_cycle {
   name: string;
   @Column('simple-array', { nullable: true })
   images:string[] = [];
+  @Column('simple-array', { nullable: true })
+  reviews:string[] = [];
+
   @Column({type:"longtext" ,nullable:true})
   subDescription: string;
   @Column({type:"longtext" ,nullable:true})
@@ -35,11 +38,23 @@ export class Educational_cycle {
   @Column({ nullable:true ,type:"text" })
   ccp: string;
   @Column({ nullable:true ,type:"text" })
+  about_video: string;
+  @Column({ nullable:true ,type:"text" })
+  about_audio: string;
+  @Column({ nullable:true ,type:"text" })
   token_bot_telegram: string;
   @Column({default:'تدفع مرة واحدة'})
   price_payment_terms: string;
   @Column()
   time: string;
+  @Column({ nullable:true ,type:"text" })
+  timeDetails: string;
+  @Column({ nullable:true ,type:"text" })
+  howToLean: string;
+  @Column({ nullable:true ,type:"text" })
+  special: string;
+  @Column({ nullable:true ,type:"text" })
+  addonCourse: string;
   @Column({ nullable: false })
   price: number;
   @Column({ nullable: true ,default: 5 })

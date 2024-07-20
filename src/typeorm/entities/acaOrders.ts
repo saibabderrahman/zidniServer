@@ -34,6 +34,8 @@ export class AcaOrder {
   status: string;
   @Column({ default: false })
   active: boolean;
+  @Column({ default: false })
+  addonCourse: boolean;
   @ManyToOne((type) => Educational_cycle)
   educational_cycle: Educational_cycle;
   @ManyToOne(() => User, user => user.orders)

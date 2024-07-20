@@ -7,7 +7,6 @@ import {EducationalCycleService} from "../educational_cycle/educational_cycle.se
 import { UsersService } from 'src/users/users.service';
 import { handleError, Options, queryAndPaginate, sendMessage } from 'src/utility/helpers.utils';
 import { LoggerService } from 'src/logger.service';
-import { RegistrationState } from 'src/typeorm/entities';
 import { RegistrationStateService } from 'src/registration-state/registration-state.service';
 
 
@@ -168,6 +167,24 @@ export class AcaOrderService {
 
       order.status = "paid";
 
+      await this.acaOrderRepository.save(order)
+
+
+    } catch (error) {
+      handleError('Error in acceptAcaOrderFromTelegram function', error,this.logger,"acadOrderService");    
+
+      
+    }
+  }
+  async SendAddonCourse(id: number): Promise<void> {
+    try {
+      const order = await this.findAcaOrderById(id);
+
+
+      if(!order.chatId) throw new BadRequestException("هذا الطلب لا يحتوى على bot telegram")
+        if(order.addonCourse) throw new BadRequestException("لقد تم إرسال الطلب بالفعل")
+      await sendMessage(order.chatId,order.educational_cycle.telegrams_links,order.educational_cycle.token_bot_telegram)
+      order.addonCourse= true
       await this.acaOrderRepository.save(order)
 
 

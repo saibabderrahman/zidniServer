@@ -149,10 +149,19 @@ export class TelegramService {
         break;
       case 'memorizationValue':
         state.data.memorizationValue = text;
-        await sendMessage(chatId, `ممتاز، ${state.data.firstName}! الآن، يُرجى إدخال الرواية التي تقرأ بها (مثلاً: حفص عن عاصم، ورش عن نافع، وغيرها من الروايات العشر):`           ,Education.token_bot_telegram
+        await sendMessage(
+          chatId, 
+          `جميل، ${state.data.firstName}! نود التعرف على مستواك في أحكام التجويد (مبتدئ، متوسط، جيد):`, 
+          Education.token_bot_telegram
         );
-        state.step = 'cart';
+        state.step = 'level';
         break;
+        case 'level':
+          state.data.level = text;
+          await sendMessage(chatId, `ممتاز، ${state.data.firstName}! الآن، يُرجى إدخال الرواية التي تقرأ بها (مثلاً: حفص عن عاصم، ورش عن نافع، وغيرها من الروايات العشر):`           ,Education.token_bot_telegram
+          );
+          state.step = 'cart';
+          break;
       case 'cart':
         state.data.cart = text;
         await sendMessage(chatId, `تم التسجيل بنجاح، ${state.data.firstName}! نشكرك على تعاونك.`,Education.token_bot_telegram  );
@@ -242,13 +251,16 @@ export class TelegramService {
   async handleCommand(command: string, messageObj: any, education: number): Promise<void> {
     const chatId = messageObj.chat.id;
     const Education = await this.educationService.findOne(education);
+
+    const howTolearn = Education.howToLean
+    const special = Education.special
+    const timeDetails  = Education.timeDetails
   
     switch (command) {
       case 'start':
         await sendMedia(chatId, "./src/telegram/audio.mp3","audio",Education.token_bot_telegram);
         await sendMessage(chatId, `مرحبا بك معنا في ${Education.name}`,Education.token_bot_telegram);
         await sendMedia(chatId, "./src/telegram/description.mp4","video",Education.token_bot_telegram);
-      await sendMessage(chatId,`لبدء عملية التسجيل، أدخل "حسنا".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`,Education.token_bot_telegram );
         break;
       case 'price':
         if (Education.price) {
@@ -257,6 +269,8 @@ export class TelegramService {
           await sendMessage(chatId, `عذرًا، لا يوجد معلومات متاحة حاليًا حول السعر.`           ,Education.token_bot_telegram
           );
         }
+        await sendMessage(chatId, `لبدء عملية التسجيل، أدخل "حسنا".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة\n- /howTolearn لمعرفة كيفية الدراسة\n- /special لمعرفة الحالات الخاصة`, Education.token_bot_telegram);
+
         break;
   
       case 'admin':
@@ -272,29 +286,52 @@ export class TelegramService {
   
   نحن هنا لمساعدتك في أي استفسار أو مساعدة تحتاجها.
         `;
-        await sendMessage(chatId, contactMessage           ,Education.token_bot_telegram
-        );
+        await sendMessage(chatId, contactMessage           ,Education.token_bot_telegram );
+        await sendMessage(chatId, `لبدء عملية التسجيل، أدخل "حسنا".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة\n- /howTolearn لمعرفة كيفية الدراسة\n- /special لمعرفة الحالات الخاصة`, Education.token_bot_telegram);
+
         break;
   
       case 'time':
-        await sendMessage(chatId, `مدة الدورة هي ${Education.time}.\n\nلبدء عملية التسجيل، أدخل "حسنا".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`,Education.token_bot_telegram );
+        await sendMessage(chatId, `مدة الدورة هي ${Education.time}`,Education.token_bot_telegram );
+        await sendMessage(chatId, `${timeDetails || ""}`,Education.token_bot_telegram );
+        await sendMessage(chatId, `لبدء عملية التسجيل، أدخل "حسنا".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة\n- /howTolearn لمعرفة كيفية الدراسة\n- /special لمعرفة الحالات الخاصة`, Education.token_bot_telegram);
+
         break;
   
       case 'about':
         if (Education && Education.subDescription) {
           await sendMessage(chatId, Education.subDescription          ,Education.token_bot_telegram
           );
-          await sendMessage(chatId, `لبدء عملية التسجيل، أدخل "حسنا".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`          ,Education.token_bot_telegram
-          );
+   
         } else {
           await sendMessage(chatId, `عذرًا، لا يوجد معلومات متاحة حاليًا حول الدورة.`          ,Education.token_bot_telegram
           );
+          
         }
+        await sendMessage(chatId, `لبدء عملية التسجيل، أدخل "حسنا".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة\n- /howTolearn لمعرفة كيفية الدراسة\n- /special لمعرفة الحالات الخاصة`, Education.token_bot_telegram);
+
         break;
+        case 'howTolearn':
+          if (howTolearn) {
+            await sendMessage(chatId, howTolearn, Education.token_bot_telegram);
+          } else {
+            await sendMessage(chatId, `عذرًا، لا توجد معلومات متاحة حاليًا حول كيفية الدراسة.`, Education.token_bot_telegram);
+          }
+          await sendMessage(chatId, `لبدء عملية التسجيل، أدخل "حسنا".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة\n- /howTolearn لمعرفة كيفية الدراسة\n- /special لمعرفة الحالات الخاصة`, Education.token_bot_telegram);
+
+          break;
+        case 'special':
+          if (special) {
+            await sendMessage(chatId, special, Education.token_bot_telegram);
+          } else {
+            await sendMessage(chatId, `عذرًا، لا توجد معلومات متاحة حاليًا حول الحالات الخاصة.`, Education.token_bot_telegram);
+          }
+          await sendMessage(chatId, `لبدء عملية التسجيل، أدخل "حسنا".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة\n- /howTolearn لمعرفة كيفية الدراسة\n- /special لمعرفة الحالات الخاصة`, Education.token_bot_telegram);
+
+          break;
   
       default:
-        await sendMessage(chatId, `لبدء عملية التسجيل، أدخل "حسنا".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة`           ,Education.token_bot_telegram
-        );
+        await sendMessage(chatId, `لبدء عملية التسجيل، أدخل "حسنا".\n\nيمكنك أيضًا استخدام الأوامر التالية:\n\n- /price لمعرفة السعر\n- /admin للتواصل مع الأدمن\n- /about لمعرفة تفاصيل الدورة\n- /time لمعرفة مدة الدراسة\n- /howTolearn لمعرفة كيفية الدراسة\n- /special لمعرفة الحالات الخاصة`, Education.token_bot_telegram);
     }
   }
   
@@ -324,12 +361,14 @@ export class TelegramService {
     }
   }
 
-  @Cron('* * 6 * * *')
+  @Cron('* 1 * * * *')
   async SendMessagesREminder(){
     try {
+      
       const state = await this.registrationStateRepository.createQueryBuilder("registrationState")
       .where("registrationState.step != :step", { step: "default" })
       .getMany();
+      console.log({state})
       for ( const step of state){
         await sendMessage(step.chatId.toString(),steps[step.step].reminder,step.apiToken)
       }
