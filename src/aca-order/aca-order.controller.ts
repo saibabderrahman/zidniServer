@@ -42,10 +42,6 @@ export class AcaOrderController {
     return this.acaOrderService.acceptAcaOrder(id);
   }
 
-  @Put(':id')
-  async Accept(@Param('id') id: number): Promise<void> {
-    return this.acaOrderService.acceptAcaOrderFromTelegram(id);
-  }
   @Put('refuse/:id')
   async Refuse(@Param('id') id: number): Promise<void> {
     return this.acaOrderService.RefuseAcaOrderFromTelegram(id);
@@ -53,6 +49,10 @@ export class AcaOrderController {
   @Put('addon/:id')
   async addon(@Param('id') id: number): Promise<void> {
     return this.acaOrderService.SendAddonCourse(id);
+  }
+  @Put(':id')
+  async Accept(@Param('id') id: number): Promise<void> {
+    return this.acaOrderService.acceptAcaOrderFromTelegram(id);
   }
 
   @Delete(':id')  

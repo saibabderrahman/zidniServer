@@ -183,7 +183,7 @@ export class AcaOrderService {
 
       if(!order.chatId) throw new BadRequestException("هذا الطلب لا يحتوى على bot telegram")
         if(order.addonCourse) throw new BadRequestException("لقد تم إرسال الطلب بالفعل")
-      await sendMessage(order.chatId,order.educational_cycle.telegrams_links,order.educational_cycle.token_bot_telegram)
+      await sendMessage(order.chatId,order.educational_cycle.addonCourse,order.educational_cycle.token_bot_telegram)
       order.addonCourse= true
       await this.acaOrderRepository.save(order)
 
