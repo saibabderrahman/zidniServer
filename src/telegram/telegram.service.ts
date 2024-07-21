@@ -449,6 +449,8 @@ export class TelegramService {
             }else{
               await sendMessage(chatId, `عذرًا، لا توجد حاليا.`, Education.token_bot_telegram);
             }
+            await sendMessage(chatId, `${state ? continuationMessage(state.step) : baseMessage}`, Education.token_bot_telegram);
+
     break;
   
       default:
