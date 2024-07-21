@@ -47,7 +47,7 @@ export class EducationalCycleController {
     async findOne(@Param('id') id: number): Promise<Educational_cycle> {
         return this.educationalCycleService.findOneFrontEnd(id);
     }
-    @Get('admin:id')
+    @Get('admin/:id')
     @UseGuards(new JwtGuard)
     async findOneAdmin(@Param('id') id: number): Promise<Educational_cycle> {
         return this.educationalCycleService.findOne(id);
