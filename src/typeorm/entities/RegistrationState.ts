@@ -6,6 +6,8 @@ export class RegistrationState {
   id: number;
   @Column({ type: 'bigint', nullable: true })
   chatId: number;  
+  @Column({ default:0 })
+  counter: number; 
   @Column()
   education:number
   @Column({nullable:true})

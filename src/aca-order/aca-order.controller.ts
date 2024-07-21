@@ -22,9 +22,10 @@ export class AcaOrderController {
   async getAllAcaOrders(
     @Query('page', ParseIntPipe) page = 1,
     @Query('limit', ParseIntPipe) limit = 10,
+    @Query('education') education:number,
       ) {
     const options = { page, limit };
-    return this.acaOrderService.findAllAcaOrders(options);
+    return this.acaOrderService.findAllAcaOrders(options,education);
   }
   @Get("some")
   async calculateTotalPaidToday() {

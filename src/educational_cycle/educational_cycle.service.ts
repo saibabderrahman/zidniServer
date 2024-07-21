@@ -57,11 +57,9 @@ export class EducationalCycleService {
         const queryBuild = await this.educationRepository.createQueryBuilder('Educational_cycle')
         .leftJoinAndSelect('Educational_cycle.type_Education', 'type_Education')
         .orderBy('Educational_cycle.createdAt', 'DESC')
-
         const { limit , page } = options;
         const offset = (page - 1) * limit || 0;
         const { totalCount, hasMore, data } = await queryAndPaginate(queryBuild, offset, limit);
-
         return {
             page: options.page || 1,
             limit: limit,
@@ -69,15 +67,21 @@ export class EducationalCycleService {
             data: data,
             hasMore: hasMore,
           }; 
-  
-
     }
     async findFrontEnd(options:Options) {
         const queryBuild = await this.educationRepository.createQueryBuilder('Educational_cycle')
-       // .leftJoinAndSelect('Educational_cycle.orders', 'orders')
         .leftJoinAndSelect('Educational_cycle.type_Education', 'type_Education')
         .where("Educational_cycle.status = true")
         .orderBy('Educational_cycle.createdAt', 'DESC')
+        .select(["Educational_cycle.name",
+            "Educational_cycle.description",
+            "Educational_cycle.images",
+            "Educational_cycle.type",
+            "Educational_cycle.price",
+            "Educational_cycle.status",
+            "Educational_cycle.id",
+            "Educational_cycle.subDescription",
+        ])
 
         const { limit , page } = options;
         const offset = (page - 1) * limit || 0;
@@ -118,6 +122,26 @@ export class EducationalCycleService {
         }
         return queryBuild;
     }
+    async findOneFrontEnd(id: number): Promise<Educational_cycle> {
+        const queryBuild = await this.educationRepository.createQueryBuilder('Educational_cycle')
+        .leftJoinAndSelect('Educational_cycle.type_Education', 'type_Education')
+        .select(["Educational_cycle","type_Education"])
+        .where("Educational_cycle.id = :id" ,{id})
+        .select(["Educational_cycle.name",
+            "Educational_cycle.description",
+            "Educational_cycle.images",
+            "Educational_cycle.type",
+            "Educational_cycle.price",
+            "Educational_cycle.id",
+            "Educational_cycle.subDescription",
+        ])
+        .getOne()
+        if (!queryBuild) {
+            throw new NotFoundException(`الدورة التدريبية  غير موجودة`);
+        }
+        return queryBuild;
+    }
+
 
 
     

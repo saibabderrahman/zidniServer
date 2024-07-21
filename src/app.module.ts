@@ -84,6 +84,7 @@ import { ScheduleModule } from '@nestjs/schedule';
           },
         },
         defaults: {
+          
           from: 'doondoon273@gmail.com',
         },
         template: {

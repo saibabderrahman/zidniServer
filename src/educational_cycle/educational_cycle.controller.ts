@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, UsePipes, ValidationPipe, Query, ParseIntPipe, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, UsePipes, ValidationPipe, Query, ParseIntPipe, Patch, UseGuards } from '@nestjs/common';
 import { Educational_cycle } from 'src/typeorm/entities/Educational_cycle';
 import { EducationalCycleService } from './educational_cycle.service';
 import { EducationalCycleDTO } from './dto/EducationalCycleDTO';
+import { JwtGuard } from 'src/admin/Guard';
 
 @Controller('educational-cycles')
 export class EducationalCycleController {
@@ -44,7 +45,11 @@ export class EducationalCycleController {
 
     @Get(':id')
     async findOne(@Param('id') id: number): Promise<Educational_cycle> {
-
+        return this.educationalCycleService.findOneFrontEnd(id);
+    }
+    @Get('admin:id')
+    @UseGuards(new JwtGuard)
+    async findOneAdmin(@Param('id') id: number): Promise<Educational_cycle> {
         return this.educationalCycleService.findOne(id);
     }
 

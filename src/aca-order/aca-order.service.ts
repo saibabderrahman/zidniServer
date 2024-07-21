@@ -76,13 +76,17 @@ export class AcaOrderService {
     }
   }
 
-  async findAllAcaOrders(options:Options) {
+  async findAllAcaOrders(options:Options ,education:number) {
     try {
       const queryBuild = await this.acaOrderRepository.createQueryBuilder('AcaOrder')
       .leftJoinAndSelect('AcaOrder.educational_cycle', 'educational_cycle')
       .leftJoinAndSelect('AcaOrder.user', 'user')
       .where("AcaOrder.active = false")
       .orderBy('AcaOrder.updatedAt', 'DESC');
+
+      if(education){
+        queryBuild.andWhere("educational_cycle.id = :education",{education})
+      }
 
   
       const { limit , page } = options;
