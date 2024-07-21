@@ -27,12 +27,14 @@ export class EducationalCycleController {
         return this.educationalCycleService.findAll(options);
     }
     @Get("all")
+
     async findAllFrontEnd(
         @Query('page', ParseIntPipe) page = 1,
         @Query('limit', ParseIntPipe) limit = 10,
   
     ) {
         const options = { page, limit };
+        
         return this.educationalCycleService.findFrontEnd(options);
     }
 

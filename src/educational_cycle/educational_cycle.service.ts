@@ -72,7 +72,7 @@ export class EducationalCycleService {
         const queryBuild = await this.educationRepository.createQueryBuilder('Educational_cycle')
         .leftJoinAndSelect('Educational_cycle.type_Education', 'type_Education')
         .where("Educational_cycle.status = true")
-        .orderBy('Educational_cycle.createdAt', 'DESC')
+        .orderBy('Educational_cycle.id', 'DESC')
         .select(["Educational_cycle.name",
             "Educational_cycle.description",
             "Educational_cycle.images",
