@@ -108,7 +108,7 @@ export class TelegramService {
   \nيمكنك أيضًا استخدام الأوامر التالية:\n
   \n- /price لمعرفة السعر
   \n- /admin للتواصل مع الأدمن
-  \n- /about تفاصيل برنامج ${Education.name} 
+  \n- /about تفاصيل برنامج  
   \n- /time لمعرفة مدة الدراسة
   \n- /howTolearn لمعرفة كيفية الدراسة
   \n- /special لمعرفة الحالات الخاصة
@@ -351,7 +351,7 @@ export class TelegramService {
   \nيمكنك أيضًا استخدام الأوامر التالية:\n
   \n- /price لمعرفة السعر
   \n- /admin للتواصل مع الأدمن
-  \n- /about تفاصيل برنامج ${Education.name} 
+  \n- /about تفاصيل برنامج  
   \n- /time لمعرفة مدة الدراسة
   \n- /howTolearn لمعرفة كيفية الدراسة
   \n- /special لمعرفة الحالات الخاصة
