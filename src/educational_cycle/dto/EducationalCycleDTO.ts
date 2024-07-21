@@ -24,13 +24,9 @@ export class EducationalCycleDTO {
   @IsNumber()
   @IsOptional()
   id: number;
-
   @IsString()
   @IsOptional()
   telegrams_links: string;
-
-
-  
   @IsString()
   @IsOptional()
   price_payment_terms: string;
@@ -90,6 +86,7 @@ export class EducationalCycleDTO {
   @IsOptional()
   type: string;
   @IsNumber()
+  @IsOptional()
   type_Education:number
   @IsOptional()
   @IsBoolean()
@@ -97,7 +94,6 @@ export class EducationalCycleDTO {
   @IsOptional()
   @IsString()
   time: string;
-
   @IsOptional()
   @IsInt()
   ratings: number;

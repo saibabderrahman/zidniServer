@@ -157,23 +157,23 @@ export function filterNullEmptyPropertiesInArray(arr: any[]): any[] {
       console.error('Error sending message:', error);
     }
   }
- export async function sendMedia(
+  export async function sendMedia(
     chatId: string,
     filePath: string,
-    mediaType: 'video' | 'audio',
+    mediaType: 'video' | 'audio' | 'photo',
     apiToken: string
   ): Promise<void> {
     try {
       const formData = new FormData();
       formData.append('chat_id', chatId);
       formData.append(mediaType, fs.createReadStream(filePath));
-
+  
       await axios.post(`https://api.telegram.org/bot${apiToken}/send${mediaType.charAt(0).toUpperCase() + mediaType.slice(1)}`, formData, {
         headers: { ...formData.getHeaders() },
       });
     } catch (error) {
       console.error(`Error sending ${mediaType}:`, error.response ? error.response.data : error.message);
-      await this.sendMessage(chatId, 'Error occurred while sending media.', apiToken);
+      await sendMessage(chatId, 'Error occurred while sending media.', apiToken);
     }
   }
 
