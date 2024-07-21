@@ -362,7 +362,7 @@ export class TelegramService {
       case 'start':
         await sendMedia(chatId, "./src/telegram/audio.mp3","audio",Education.token_bot_telegram);
         await sendMessage(chatId, `مرحبا بك معنا في ${Education.name}`,Education.token_bot_telegram);
-        await sendMedia(chatId, "./src/telegram/description.mp4","video",Education.token_bot_telegram);
+        await sendMedia(chatId, Education.about_video ? `./src/upload/${Education.about_video}` :"./src/telegram/description.mp4","video",Education.token_bot_telegram);
         await sendMessage(chatId, `${state ? continuationMessage(state.step) : baseMessage}`, Education.token_bot_telegram);
 
         break;
