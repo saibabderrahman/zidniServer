@@ -54,6 +54,7 @@ import { TelegramModule } from './telegram/telegram.module';
 import { RegistrationStateModule } from './registration-state/registration-state.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MessengerModule } from './messenger/messenger.module';
+import { MessenagerBotModule } from './messenager-bot/messenager-bot.module';
 
 
 
@@ -131,6 +132,7 @@ import { MessengerModule } from './messenger/messenger.module';
     TelegramModule,
     RegistrationStateModule,
     MessengerModule,
+    MessenagerBotModule,
   ],
   controllers: [AppController],
   providers: [AppService ,TranscodeConsumer,
