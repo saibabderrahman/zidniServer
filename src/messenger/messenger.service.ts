@@ -72,13 +72,11 @@ __ في حالة أن المتدرب لم يتمكن من البرنامج ال�
   ) {}
 
   async handleMessage(senderPsid: string, receivedMessage: any): Promise<void> {
-    console.log(senderPsid,receivedMessage)
 
     try {
       
       let response;
       let state = await this.findByCHatIDMessenger(senderPsid)
-      console.log(state)
       if(!state){
         const newstate = this.registrationStateRepository.create({ chatId:senderPsid, step: 'fullName', data:{} });
         await this.registrationStateRepository.save(newstate)}
