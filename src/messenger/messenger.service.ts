@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { InjectRepository } from '@nestjs/typeorm';
 import axios from 'axios';
+import { MessengerRegistrationState } from 'src/typeorm/entities';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class MessengerService {
@@ -63,36 +66,47 @@ __ في حالة أن المتدرب لم يتمكن من البرنامج ال�
     '5': 'فريق الدعم على التيليجرام: @Baraahind  @ostadameriem',
   };
 
-  constructor(private configService: ConfigService) {}
+  constructor(private configService: ConfigService ,
+    @InjectRepository(MessengerRegistrationState) private readonly registrationStateRepository: Repository<MessengerRegistrationState>,
+
+  ) {}
 
   async handleMessage(senderPsid: string, receivedMessage: any): Promise<void> {
     let response;
-
+    let state = await this.findByCHatIDMessenger(senderPsid)
+    if(!state){
+      const newstate = this.registrationStateRepository.create({ chatId:senderPsid, step: 'fullName', data:{} });
+      await this.registrationStateRepository.save(newstate)}
     if (receivedMessage.text) {
       const text = receivedMessage.text.trim();
-
-      // Check if the text is a command
       if (this.commandDB[text]) {
         response = { text: this.commandDB[text] };
-      } else {
-        // Show the welcome message and command list
-        response = {
-          text: `مرحبا بك ❤ ، يسعدنا على تواصلك مع فريق الدعم لأكاديمية زدني علما للتدريب و التكوين ، نقدر اهتمامك بكتاب الله.  
-💥يرجى الرد باستخدام الأرقام 1_ 2_3...
+        await this.callSendAPI(senderPsid, response);
+        await this.callSendAPI(senderPsid, {
+          text: ` 💥يرجى الرد باستخدام الأرقام 1 2 3 4 5 ...
 1. لمعرفة تفاصيل البرنامج
 2. مدة البرنامج
 3. سعر البرنامج
 4. طريقة التسجيل
-5. فريق الدعم على التيليجرام`,
-        };
-      }
-    } else if (receivedMessage.attachments) {
-      response = {
-        text: `Thanks for the attachment!`,
-      };
-    }
+5. فريق الدعم على التيليجرام`});
 
-    await this.callSendAPI(senderPsid, response);
+      } else {
+        if(!state){
+          await this.sendAudio(senderPsid,"https://utfs.io/f/9c72c64f-4ea0-45f6-8584-1abfcdd74f16-1jgvrq.mp3")
+          await this.sendVideo(senderPsid,"https://utfs.io/f/b30ab2ae-cf5e-4cb4-a2e5-3fbd86357be7-sir090.mp4")
+          response = {
+            text: `مرحبا بك ❤ ، يسعدنا على تواصلك مع فريق الدعم لأكاديمية زدني علما للتدريب و التكوين ، نقدر اهتمامك بكتاب الله.  
+                     💥يرجى الرد باستخدام الأرقام 1_ 2_3...
+ 1. لمعرفة تفاصيل البرنامج
+ 2. مدة البرنامج
+ 3. سعر البرنامج
+ 4. طريقة التسجيل
+ 5. فريق الدعم على التيليجرام`,
+          };
+        }
+      }
+    } 
+
   }
 
   async handlePostback(senderPsid: string, receivedPostback: any): Promise<void> {
@@ -127,4 +141,70 @@ __ في حالة أن المتدرب لم يتمكن من البرنامج ال�
       console.error('Unable to send message:', error);
     }
   }
+
+  async findByCHatIDMessenger(chatId:string):Promise<MessengerRegistrationState>{
+    try {
+      let state = await this.registrationStateRepository.findOne({ where: { chatId  } });
+      return state
+    } catch (error) {
+
+    }
+  }
+
+  private async sendVideo(senderPsid: string, videoUrl: string): Promise<void> {
+    const PAGE_ACCESS_TOKEN = this.configService.get<string>('PAGE_ACCESS_TOKEN');
+
+    const requestBody = {
+      recipient: {
+        id: senderPsid,
+      },
+      message: {
+        attachment: {
+          type: 'video',
+          payload: {
+            url: videoUrl,
+            is_reusable: true
+          }
+        }
+      }
+    };
+
+    try {
+      await axios.post(
+        `https://graph.facebook.com/v12.0/me/messages?access_token=${PAGE_ACCESS_TOKEN}`,
+        requestBody,
+      );
+    } catch (error) {
+      console.error('Unable to send audio:', error.response.data);
+    }
+  }
+
+  private async sendAudio(senderPsid: string, audioUrl: string): Promise<void> {
+    const PAGE_ACCESS_TOKEN = this.configService.get<string>('PAGE_ACCESS_TOKEN');
+
+    const requestBody = {
+      recipient: {
+        id: senderPsid,
+      },
+      message: {
+        attachment: {
+          type: 'audio',
+          payload: {
+            url: audioUrl,
+            is_reusable: true
+          }
+        }
+      }
+    };
+
+    try {
+      await axios.post(
+        `https://graph.facebook.com/v12.0/me/messages?access_token=${PAGE_ACCESS_TOKEN}`,
+        requestBody,
+      );
+    } catch (error) {
+      console.error('Unable to send audio:', error.response.data);
+    }
+  }
+
 }

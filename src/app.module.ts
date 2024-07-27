@@ -47,7 +47,7 @@ import { TypeEducationModule } from './type_education/type_education.module';
 import { QuranTafseerModule } from './quran-tafseer/quran-tafseer.module';
 import { StatesModule } from './states/states.module';
 import { FacebookPixelModule } from './facebook-pixel/facebook-pixel.module';
-import { Commune, FacebookPixel, RegistrationState, Wilaya } from './typeorm/entities';
+import { Commune, FacebookPixel, MessengerRegistrationState, RegistrationState, Wilaya } from './typeorm/entities';
 import { Logger } from 'winston';
 import { LoggerService } from './logger.service';
 import { TelegramModule } from './telegram/telegram.module';
@@ -104,7 +104,7 @@ import { MessengerModule } from './messenger/messenger.module';
       username: process.env.DATABASE_USERNAME,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      entities: [Subject, Note,RegistrationState ,Solution ,Teacher,Classes ,Type, Educational_cycle  ,Category , Levels,
+      entities: [Subject, MessengerRegistrationState, Note,RegistrationState ,Solution ,Teacher,Classes ,Type, Educational_cycle  ,Category , Levels,
          User,Order ,Admin,Lesson,Attendance,Balance,AcaOrder ,Duties ,Type_Education ,Wilaya,Commune,FacebookPixel],
       synchronize: true,
     }),

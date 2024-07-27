@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { RegistrationState } from 'src/typeorm/entities';
+import { MessengerRegistrationState, RegistrationState } from 'src/typeorm/entities';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -8,6 +8,7 @@ export class RegistrationStateService {
   constructor(
     @InjectRepository(RegistrationState)
     private readonly registrationStateRepository: Repository<RegistrationState>,
+    @InjectRepository(MessengerRegistrationState) private readonly MessengerRegistrationStateRepository: Repository<MessengerRegistrationState>,
   ) {}
 
   
@@ -42,6 +43,14 @@ export class RegistrationStateService {
       return state
     } catch (error) {
       throw new NotFoundException("not found")
+    }
+  }
+  async findByCHatIDMessenger(chatId:number):Promise<RegistrationState>{
+    try {
+      let state = await this.registrationStateRepository.findOne({ where: { chatId  } });
+      return state
+    } catch (error) {
+
     }
   }
   async save(state:RegistrationState):Promise<void>{
