@@ -17,9 +17,6 @@ export class MessengerController {
     const mode = req.query['hub.mode'];
     const token = req.query['hub.verify_token'];
     const challenge = req.query['hub.challenge'];
-    console.log(req?.body)
-    console.log(mode ,token,challenge)
-
     if (mode && token) {
       if (mode === 'subscribe' && token === VERIFY_TOKEN) {
         console.log('WEBHOOK_VERIFIED');
