@@ -16,6 +16,15 @@ export class RegistrationStateController {
       throw error;
     }
   }
+  @Get("messanger")
+  async find() {
+    try {
+      return await this.registrationStateService.findAllMessenger();
+    } catch (error) {
+      // Handle specific errors or log them
+      throw error;
+    }
+  }
 
   @Delete(':chatId')
   async findOne(@Param('chatId') chatId: number){

@@ -21,6 +21,14 @@ export class RegistrationStateService {
     }
   }
 
+  async findAllMessenger(): Promise<MessengerRegistrationState[]> {
+    try {
+      return await this.MessengerRegistrationStateRepository.find();
+    } catch (error) {
+      throw error;
+    }
+  }
+
 
 
   
@@ -38,6 +46,8 @@ export class RegistrationStateService {
       throw error;
     }
   }
+
+
 
 
 
