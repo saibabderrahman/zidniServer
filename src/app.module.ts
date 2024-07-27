@@ -53,6 +53,7 @@ import { LoggerService } from './logger.service';
 import { TelegramModule } from './telegram/telegram.module';
 import { RegistrationStateModule } from './registration-state/registration-state.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { MessengerModule } from './messenger/messenger.module';
 
 
 
@@ -129,6 +130,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     FacebookPixelModule,
     TelegramModule,
     RegistrationStateModule,
+    MessengerModule,
   ],
   controllers: [AppController],
   providers: [AppService ,TranscodeConsumer,

@@ -8,7 +8,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use('/', express.static(path.join(__dirname, '../src/upload')));
   app.enableCors();
-  app.setGlobalPrefix('api/v1'); // Add this line to set the global prefix
+  app.setGlobalPrefix('api/v1');
 
  await app.listen(process.env.PORT || 8000);
 }
