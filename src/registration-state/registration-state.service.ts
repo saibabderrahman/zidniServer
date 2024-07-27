@@ -23,6 +23,9 @@ export class RegistrationStateService {
 
 
 
+  
+
+
 
   async remove(id): Promise<void> {
     try {
@@ -35,6 +38,8 @@ export class RegistrationStateService {
       throw error;
     }
   }
+
+
 
   async findByCHatID(chatId:number,education:number):Promise<RegistrationState>{
     try {

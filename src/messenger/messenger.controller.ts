@@ -30,14 +30,21 @@ export class MessengerController {
     }
   }
 
+
+
+
+
+
   @Post("webhook")
   async handleWebhook(@Req() req: Request, @Res() res: Response): Promise<void> {
     const body = req.body;
 
+    console.log(body)
     if (body.object === 'page') {
       body.entry.forEach(async (entry) => {
         const webhookEvent = entry.messaging[0];
         const senderPsid = webhookEvent.sender.id;
+        console.log(webhookEvent.message,senderPsid)
         if (webhookEvent.message) {
           await this.messengerService.handleMessage(senderPsid, webhookEvent.message);
         } else if (webhookEvent.postback) {

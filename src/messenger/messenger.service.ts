@@ -72,40 +72,49 @@ __ في حالة أن المتدرب لم يتمكن من البرنامج ال�
   ) {}
 
   async handleMessage(senderPsid: string, receivedMessage: any): Promise<void> {
-    let response;
-    let state = await this.findByCHatIDMessenger(senderPsid)
-    if(!state){
-      const newstate = this.registrationStateRepository.create({ chatId:senderPsid, step: 'fullName', data:{} });
-      await this.registrationStateRepository.save(newstate)}
-    if (receivedMessage.text) {
-      const text = receivedMessage.text.trim();
-      if (this.commandDB[text]) {
-        response = { text: this.commandDB[text] };
-        await this.callSendAPI(senderPsid, response);
-        await this.callSendAPI(senderPsid, {
-          text: ` 💥يرجى الرد باستخدام الأرقام 1 2 3 4 5 ...
-1. لمعرفة تفاصيل البرنامج
-2. مدة البرنامج
-3. سعر البرنامج
-4. طريقة التسجيل
-5. فريق الدعم على التيليجرام`});
+    console.log(senderPsid,receivedMessage)
 
-      } else {
-        if(!state){
-          await this.sendAudio(senderPsid,"https://utfs.io/f/9c72c64f-4ea0-45f6-8584-1abfcdd74f16-1jgvrq.mp3")
-          await this.sendVideo(senderPsid,"https://utfs.io/f/b30ab2ae-cf5e-4cb4-a2e5-3fbd86357be7-sir090.mp4")
-          response = {
-            text: `مرحبا بك ❤ ، يسعدنا على تواصلك مع فريق الدعم لأكاديمية زدني علما للتدريب و التكوين ، نقدر اهتمامك بكتاب الله.  
-                     💥يرجى الرد باستخدام الأرقام 1_ 2_3...
- 1. لمعرفة تفاصيل البرنامج
- 2. مدة البرنامج
- 3. سعر البرنامج
- 4. طريقة التسجيل
- 5. فريق الدعم على التيليجرام`,
-          };
+    try {
+      
+      let response;
+      let state = await this.findByCHatIDMessenger(senderPsid)
+      console.log(state)
+      if(!state){
+        const newstate = this.registrationStateRepository.create({ chatId:senderPsid, step: 'fullName', data:{} });
+        await this.registrationStateRepository.save(newstate)}
+      if (receivedMessage.text) {
+        const text = receivedMessage.text.trim();
+        if (this.commandDB[text]) {
+          response = { text: this.commandDB[text] };
+          await this.callSendAPI(senderPsid, response);
+          await this.callSendAPI(senderPsid, {
+            text: ` 💥يرجى الرد باستخدام الأرقام 1 2 3 4 5 ...
+  1. لمعرفة تفاصيل البرنامج
+  2. مدة البرنامج
+  3. سعر البرنامج
+  4. طريقة التسجيل
+  5. فريق الدعم على التيليجرام`});
+  
+        } else {
+          if(!state){
+            await this.sendAudio(senderPsid,"https://utfs.io/f/9c72c64f-4ea0-45f6-8584-1abfcdd74f16-1jgvrq.mp3")
+            await this.sendVideo(senderPsid,"https://utfs.io/f/b30ab2ae-cf5e-4cb4-a2e5-3fbd86357be7-sir090.mp4")
+            response = {
+              text: `مرحبا بك ❤ ، يسعدنا على تواصلك مع فريق الدعم لأكاديمية زدني علما للتدريب و التكوين ، نقدر اهتمامك بكتاب الله.  
+                       💥يرجى الرد باستخدام الأرقام 1_ 2_3...
+   1. لمعرفة تفاصيل البرنامج
+   2. مدة البرنامج
+   3. سعر البرنامج
+   4. طريقة التسجيل
+   5. فريق الدعم على التيليجرام`,
+            };
+          }
         }
-      }
-    } 
+      } 
+    } catch (error) {
+      console.log(error)
+      
+    }
 
   }
 
