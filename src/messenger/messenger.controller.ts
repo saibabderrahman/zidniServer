@@ -43,6 +43,8 @@ export class MessengerController {
           await this.messengerService.handlePostback(senderPsid, webhookEvent.postback);
         }
       });
+      
+
 
       res.status(200).send('EVENT_RECEIVED');
     } else {
