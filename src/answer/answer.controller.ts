@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, Delete, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Delete, UsePipes, ValidationPipe, Query, ParseIntPipe } from '@nestjs/common';
 import { AnswerService } from './answer.service';
 import { CreateAnswerDto } from './dto/create-answer.dto';
 import { Answer } from 'src/typeorm/entities';
@@ -16,9 +16,12 @@ export class AnswerController {
     return this.answerService.create(createAnswerDto);
   }
 
-  @Get()
-  findAll(): Promise<Answer[]> {
-    return this.answerService.findAll();
+  @Get( )
+  findAll(
+    @Query('page', ParseIntPipe) page = 1,
+    @Query('limit', ParseIntPipe) limit = 10,
+  ){
+    return this.answerService.findAll({page,limit});
   }
 
   @Get(':id')

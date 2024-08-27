@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateAnswerDto } from './dto/create-answer.dto';
 import { Answer, Quiz } from 'src/typeorm/entities';
+import { Options, queryAndPaginate } from 'src/utility/helpers.utils';
 
 @Injectable()
 export class AnswerService {
@@ -53,8 +54,20 @@ export class AnswerService {
   }
 
 
-  async findAll(): Promise<Answer[]> {
-    return this.answerRepository.find({ relations: ['quiz'] });
+  async findAll(options:Options) {
+    const queryBuild =  await this.answerRepository.createQueryBuilder("answer")
+    .leftJoinAndSelect("answer.quiz" ,"quiz")
+    const { limit , page } = options;
+    const offset = (page - 1) * limit || 0;
+    const { totalCount, hasMore, data } = await queryAndPaginate(queryBuild, offset, limit);
+
+    return {
+      page: options.page || 1,
+      limit: limit,
+      totalCount: totalCount,
+      data: data,
+      hasMore: hasMore,
+    }; 
   }
 
   async findOne(id: number): Promise<Answer> {
